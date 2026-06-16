@@ -1,0 +1,4347 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cyber Network Pathfinder</title>
+  <style>
+    :root {
+      --bg: #080b10;
+      --panel: #101820;
+      --panel-2: #14202b;
+      --line: #284052;
+      --text: #e7f5ff;
+      --muted: #8fa7b7;
+      --cyan: #2ff3ff;
+      --green: #6dff9b;
+      --yellow: #ffe66d;
+      --red: #ff5f7a;
+      --purple: #a78bfa;
+      --blue: #5ea1ff;
+    }
+
+    body[data-theme="light"] {
+      --bg: #eef4f7;
+      --panel: #ffffff;
+      --panel-2: #e8f0f4;
+      --line: #b7c8d2;
+      --text: #14232d;
+      --muted: #58707e;
+      --cyan: #007f8c;
+      --green: #168348;
+      --yellow: #8a6500;
+      --red: #c73550;
+      --purple: #6545b5;
+      --blue: #2563b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(145, 153, 160, 0.72) transparent;
+    }
+
+    *::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    *::-webkit-scrollbar-track,
+    *::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      min-height: 32px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      background: rgba(145, 153, 160, 0.72);
+      background-clip: padding-box;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background: rgba(177, 184, 190, 0.9);
+      background-clip: padding-box;
+    }
+
+    *::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    body[data-theme="light"] * {
+      scrollbar-color: rgba(91, 104, 113, 0.72) transparent;
+    }
+
+    body[data-theme="light"] *::-webkit-scrollbar-thumb {
+      background: rgba(91, 104, 113, 0.72);
+      background-clip: padding-box;
+    }
+
+    body[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
+      background: rgba(65, 78, 87, 0.9);
+      background-clip: padding-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(47, 243, 255, 0.14), transparent 28%),
+        radial-gradient(circle at 84% 12%, rgba(167, 139, 250, 0.12), transparent 24%),
+        linear-gradient(135deg, #06070b 0%, #0b1218 48%, #10151a 100%);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Pretendard, system-ui, sans-serif;
+    }
+
+    body[data-theme="light"] {
+      background: #edf3f6;
+    }
+
+    body[data-theme="light"] .sidebar,
+    body[data-theme="light"] .stage {
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 18px 50px rgba(32, 62, 78, 0.14);
+    }
+
+    body[data-theme="light"] .tab,
+    body[data-theme="light"] .btn,
+    body[data-theme="light"] .icon-btn,
+    body[data-theme="light"] .collapse-btn,
+    body[data-theme="light"] .history-select,
+    body[data-theme="light"] .settings-panel,
+    body[data-theme="light"] .setting-select {
+      background: #f6fafc;
+      color: var(--text);
+    }
+
+    body[data-theme="light"] .tab,
+    body[data-theme="light"] .btn,
+    body[data-theme="light"] .icon-btn {
+      border-color: #c3d1d9;
+      box-shadow: 0 1px 2px rgba(42, 66, 78, 0.08);
+    }
+
+    body[data-theme="light"] .tab.active {
+      border-color: #008b99;
+      background: #d7f3f5;
+      box-shadow: inset 4px 0 0 #008b99, 0 2px 8px rgba(0, 127, 140, 0.16);
+    }
+
+    body[data-theme="light"] .tab.active strong {
+      color: #075d66;
+    }
+
+    body[data-theme="light"] .tab.active span {
+      color: #315f68;
+    }
+
+    body[data-theme="light"] .btn.primary {
+      border-color: #007b86;
+      background: #087f89;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 111, 122, 0.22);
+    }
+
+    body[data-theme="light"] .btn.danger {
+      border-color: #d85469;
+      background: #fff0f2;
+      color: #a8213b;
+    }
+
+    body[data-theme="light"] .icon-btn.active {
+      border-color: #9b7300;
+      background: #fff2b8;
+      color: #654a00;
+      box-shadow: inset 0 0 0 1px rgba(155, 115, 0, 0.12);
+    }
+
+    body[data-theme="light"] .tab:hover,
+    body[data-theme="light"] .btn:hover,
+    body[data-theme="light"] .icon-btn:hover {
+      border-color: #168b96;
+    }
+
+    body[data-theme="light"] .check-row input {
+      accent-color: #008b99;
+    }
+
+    body[data-theme="light"] .grid,
+    body[data-theme="light"] .mini-grid,
+    body[data-theme="light"] .average-preview-grid,
+    body[data-theme="light"] .average-panel,
+    body[data-theme="light"] .compare-card,
+    body[data-theme="light"] .metric,
+    body[data-theme="light"] .settings-summary,
+    body[data-theme="light"] .quick-summary div {
+      background: rgba(235, 243, 247, 0.92);
+    }
+
+    body[data-theme="light"] .grid,
+    body[data-theme="light"] .mini-grid {
+      border-color: #9bb2bf;
+      background: #cbd9e1;
+      box-shadow: inset 0 0 0 1px rgba(58, 83, 98, 0.12);
+    }
+
+    body[data-theme="light"] .cell {
+      color: #153242;
+      box-shadow: inset 0 0 0 1px rgba(48, 76, 91, 0.2);
+    }
+
+    body[data-theme="light"] .wall {
+      background:
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.2) 0 2px, rgba(0,0,0,0.12) 2px 6px),
+        #344955 !important;
+      box-shadow: inset 0 0 0 2px #1e313b, 0 0 0 1px rgba(255,255,255,0.5);
+    }
+
+    body[data-theme="light"] .visited {
+      background: #1769d2 !important;
+      color: #ffffff;
+    }
+
+    body[data-theme="light"] .frontier {
+      background: #f2b705 !important;
+      color: #241a00;
+    }
+
+    body[data-theme="light"] .path {
+      background: #159447 !important;
+      color: #ffffff;
+    }
+
+    body[data-theme="light"] .start {
+      background: #008b99 !important;
+      color: #ffffff;
+    }
+
+    body[data-theme="light"] .goal {
+      background: #d13652 !important;
+      color: #ffffff;
+    }
+
+    body[data-theme="light"] .legend-row:nth-child(3) .swatch {
+      background: #344955 !important;
+    }
+
+    body.reduce-effects *,
+    body.reduce-effects *::before,
+    body.reduce-effects *::after {
+      transition: none !important;
+      animation: none !important;
+      box-shadow: none !important;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .app.sidebar-collapsed {
+      grid-template-columns: 64px minmax(0, 1fr);
+    }
+
+    .sidebar, .stage {
+      border: 1px solid rgba(143, 167, 183, 0.18);
+      background: rgba(16, 24, 32, 0.78);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(16px);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 18px;
+      border-radius: 8px;
+      transition: padding 180ms ease;
+    }
+
+    .app.sidebar-collapsed .sidebar {
+      padding: 10px;
+      align-items: center;
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+      align-items: start;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .collapse-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(143, 167, 183, 0.22);
+      background: rgba(20, 32, 43, 0.86);
+      color: var(--cyan);
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .sidebar-body {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .quick-controls {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      width: 44px;
+    }
+
+    .quick-controls .icon-btn {
+      width: 44px;
+      height: 42px;
+      min-height: 42px;
+      padding: 0;
+    }
+
+    .app.sidebar-collapsed .quick-controls {
+      display: flex;
+    }
+
+    .quick-summary {
+      display: none;
+      width: 44px;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.15;
+    }
+
+    .quick-summary div {
+      padding: 6px 4px;
+      border: 1px solid rgba(143, 167, 183, 0.16);
+      border-radius: 8px;
+      background: rgba(8, 11, 16, 0.48);
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    .quick-summary strong {
+      display: block;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .app.sidebar-collapsed .quick-summary {
+      display: grid;
+    }
+
+    .app.sidebar-collapsed .brand {
+      display: block;
+    }
+
+    .app.sidebar-collapsed .brand-copy,
+    .app.sidebar-collapsed .sidebar-body {
+      display: none;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .tab, .btn, .icon-btn {
+      border: 1px solid rgba(143, 167, 183, 0.22);
+      background: rgba(20, 32, 43, 0.86);
+      color: var(--text);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .tab {
+      min-height: 44px;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .tab strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .tab span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tab:hover, .btn:hover, .icon-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(47, 243, 255, 0.6);
+    }
+
+    .btn:disabled, .icon-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      transform: none;
+    }
+
+    .tab.active {
+      border-color: var(--cyan);
+      background: linear-gradient(135deg, rgba(47, 243, 255, 0.18), rgba(94, 161, 255, 0.12));
+      box-shadow: 0 0 22px rgba(47, 243, 255, 0.14);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .settings-summary {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid rgba(143, 167, 183, 0.16);
+      border-radius: 8px;
+      background: rgba(8, 11, 16, 0.46);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .settings-summary strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .history-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .history-select {
+      width: 100%;
+      min-height: 40px;
+      padding: 7px 9px;
+      border: 1px solid rgba(143, 167, 183, 0.22);
+      border-radius: 8px;
+      background: rgba(20, 32, 43, 0.86);
+      color: var(--text);
+    }
+
+    .history-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .history-group .label {
+      font-size: 11px;
+    }
+
+    .history-detail {
+      min-height: 38px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .rank-badge {
+      display: inline-grid;
+      place-items: center;
+      min-width: 26px;
+      min-height: 22px;
+      padding: 2px 6px;
+      border: 1px solid rgba(255, 230, 109, 0.48);
+      border-radius: 6px;
+      color: var(--yellow);
+      background: rgba(255, 230, 109, 0.09);
+      font-weight: 900;
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 9px 12px;
+      font-weight: 700;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(47, 243, 255, 0.28), rgba(109, 255, 155, 0.2));
+      border-color: rgba(47, 243, 255, 0.78);
+    }
+
+    .btn.danger {
+      border-color: rgba(255, 95, 122, 0.45);
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .tool-help {
+      min-height: 34px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+      gap: 8px;
+    }
+
+    .compare-selection {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(143, 167, 183, 0.16);
+    }
+
+    .compare-selection-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 10px;
+      margin-top: 7px;
+    }
+
+    .compare-selection .check-row {
+      padding: 5px 0;
+    }
+
+    .compare-selection.hidden {
+      display: none;
+    }
+
+    .icon-btn {
+      min-height: 38px;
+      display: grid;
+      place-items: center;
+      padding: 8px;
+      font-weight: 800;
+    }
+
+    .icon-btn.active {
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+
+    .slider-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slider-row.hidden {
+      display: none;
+    }
+
+    .section.hidden {
+      display: none;
+    }
+
+    .section.settings-filtered {
+      display: none;
+    }
+
+    .settings-browser {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      display: grid;
+      gap: 8px;
+      padding: 4px 0 12px;
+      background: var(--panel);
+    }
+
+    .settings-search {
+      width: 100%;
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .settings-search:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(47, 243, 255, 0.1);
+    }
+
+    .settings-categories {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .settings-categories .icon-btn {
+      min-width: max-content;
+      min-height: 32px;
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    .settings-empty {
+      display: none;
+      padding: 18px 8px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .settings-empty.active {
+      display: block;
+    }
+
+    .limit-controls.hidden {
+      display: none;
+    }
+
+    .limit-controls.disabled {
+      opacity: 0.45;
+    }
+
+    .slider-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .slider-head strong {
+      min-width: 54px;
+      color: var(--text);
+      cursor: text;
+      text-align: right;
+    }
+
+    .label-editor {
+      width: 82px;
+      padding: 3px 6px;
+      border: 1px solid rgba(47, 243, 255, 0.62);
+      border-radius: 6px;
+      background: rgba(8, 11, 16, 0.92);
+      color: var(--text);
+      text-align: right;
+      outline: none;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+    }
+
+    input[type="range"]:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .check-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--cyan);
+    }
+
+    .tip {
+      display: inline-grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(47, 243, 255, 0.48);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(47, 243, 255, 0.1);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: help;
+    }
+
+    .inline-note {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .readout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stage-bottom {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(420px, 0.8fr);
+      gap: 14px;
+      align-items: end;
+    }
+
+    .stage-telemetry {
+      min-width: 0;
+    }
+
+    .stage-telemetry .label {
+      margin-bottom: 7px;
+      text-align: right;
+    }
+
+    .stage-telemetry .readout {
+      grid-template-columns: repeat(5, minmax(78px, 1fr));
+    }
+
+    .stage-telemetry .metric {
+      min-width: 0;
+      padding: 8px;
+    }
+
+    .stage-telemetry .metric strong {
+      margin-top: 3px;
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .stage-telemetry .metric span {
+      font-size: 10px;
+    }
+
+    .metric {
+      padding: 12px;
+      border: 1px solid rgba(143, 167, 183, 0.16);
+      border-radius: 8px;
+      background: rgba(8, 11, 16, 0.46);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 22px;
+    }
+
+    .legend {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swatch {
+      width: 15px;
+      height: 15px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .stage {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 14px;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(47, 243, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 243, 255, 0.055) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, black, transparent 92%);
+    }
+
+    .topbar, .statusbar {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .zoom-controls {
+      display: grid;
+      grid-template-columns: 34px 58px 34px;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .zoom-controls .icon-btn {
+      min-height: 34px;
+      height: 34px;
+      padding: 0;
+    }
+
+    .zoom-value {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .settings-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .settings-panel {
+      position: fixed;
+      z-index: 50;
+      top: 68px;
+      right: 24px;
+      width: min(340px, calc(100vw - 32px));
+      max-height: calc(100vh - 90px);
+      display: none;
+      overflow-y: auto;
+      padding: 14px;
+      border: 1px solid rgba(143, 167, 183, 0.3);
+      border-radius: 8px;
+      background: rgba(16, 24, 32, 0.98);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
+    }
+
+    .settings-panel.open {
+      display: grid;
+      gap: 14px;
+    }
+
+    .settings-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .settings-head h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .settings-group {
+      display: grid;
+      gap: 7px;
+    }
+
+    .settings-group > label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .setting-select {
+      width: 100%;
+      min-height: 40px;
+      padding: 7px 9px;
+      border: 1px solid rgba(143, 167, 183, 0.24);
+      border-radius: 8px;
+      background: rgba(20, 32, 43, 0.9);
+      color: var(--text);
+    }
+
+    .settings-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .stage-telemetry.hidden {
+      display: none;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 6px 10px;
+      border: 1px solid rgba(47, 243, 255, 0.34);
+      border-radius: 999px;
+      color: var(--cyan);
+      background: rgba(47, 243, 255, 0.08);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .grid-wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      overflow: auto;
+    }
+
+    .zoom-canvas {
+      width: 100%;
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+    }
+
+    .grid {
+      width: min(100%, calc((100vh - 160px) * 1.2));
+      max-width: 980px;
+      aspect-ratio: var(--grid-cols, 24) / var(--grid-rows, 16);
+      display: grid;
+      grid-template-columns: repeat(var(--grid-cols, 24), 1fr);
+      grid-template-rows: repeat(var(--grid-rows, 16), 1fr);
+      gap: 3px;
+      padding: 10px;
+      border: 1px solid rgba(47, 243, 255, 0.25);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.78);
+      box-shadow: inset 0 0 34px rgba(47, 243, 255, 0.08), 0 0 42px rgba(47, 243, 255, 0.08);
+    }
+
+    .compare-wrap {
+      width: min(100%, 1120px);
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .compare-wrap.active {
+      display: grid;
+    }
+
+    .compare-wrap[data-count="3"] {
+      width: min(100%, 1120px);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .compare-wrap[data-count="3"] .compare-card:last-child {
+      width: calc(50% - 6px);
+      grid-column: 1 / -1;
+      justify-self: center;
+    }
+
+    .average-panel {
+      width: min(100%, 980px);
+      display: none;
+      overflow-x: auto;
+      border: 1px solid rgba(143, 167, 183, 0.18);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.72);
+      padding: 14px;
+    }
+
+    .average-panel.active {
+      display: block;
+    }
+
+    .average-live {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.8fr) minmax(220px, 1fr);
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(143, 167, 183, 0.16);
+    }
+
+    .average-preview {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .average-preview-card {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+    }
+
+    .average-preview-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .average-preview-grid {
+      width: 100%;
+      aspect-ratio: var(--grid-cols, 24) / var(--grid-rows, 16);
+      display: grid;
+      grid-template-columns: repeat(var(--grid-cols, 24), 1fr);
+      grid-template-rows: repeat(var(--grid-rows, 16), 1fr);
+      gap: 1px;
+      padding: 5px;
+      border: 1px solid rgba(47, 243, 255, 0.24);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.82);
+    }
+
+    .average-preview-grid .cell {
+      border-radius: 2px;
+      font-size: 0;
+    }
+
+    .average-progress {
+      display: grid;
+      gap: 8px;
+    }
+
+    .average-progress strong {
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .average-progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: rgba(143, 167, 183, 0.18);
+    }
+
+    .average-progress-fill {
+      width: 0;
+      height: 100%;
+      background: var(--cyan);
+      transition: width 80ms linear;
+    }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .result-table th,
+    .result-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(143, 167, 183, 0.16);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .result-table th:first-child,
+    .result-table td:first-child {
+      text-align: left;
+    }
+
+    .result-table th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(20, 32, 43, 0.72);
+    }
+
+    .result-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .average-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .compare-card {
+      min-width: 0;
+      border: 1px solid rgba(143, 167, 183, 0.18);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.64);
+      padding: 10px;
+    }
+
+    .compare-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mini-grid {
+      width: 100%;
+      aspect-ratio: var(--grid-cols, 24) / var(--grid-rows, 16);
+      display: grid;
+      grid-template-columns: repeat(var(--grid-cols, 24), 1fr);
+      grid-template-rows: repeat(var(--grid-rows, 16), 1fr);
+      gap: 2px;
+      padding: 7px;
+      border: 1px solid rgba(47, 243, 255, 0.16);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.82);
+    }
+
+    .cell {
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: var(--cell-bg, rgba(21, 34, 45, 0.86));
+      box-shadow: inset 0 0 0 1px rgba(143, 167, 183, 0.09);
+      color: rgba(231, 245, 255, 0.78);
+      font-size: clamp(9px, 1.1vw, 13px);
+      font-weight: 800;
+      line-height: 1;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      transition: background 90ms linear, transform 90ms linear, box-shadow 90ms linear;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    body.large-grid .cell {
+      transition: none;
+      box-shadow: none;
+    }
+
+    body.large-grid .cell:hover {
+      outline: none;
+    }
+
+    .cell:hover {
+      outline: 1px solid rgba(47, 243, 255, 0.75);
+    }
+
+    .wall {
+      background:
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.42) 0 2px, rgba(255,255,255,0.08) 2px 6px),
+        #d8e2ea !important;
+      color: transparent;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.84), 0 0 12px rgba(216, 226, 234, 0.36);
+    }
+
+    .visited {
+      background: #2563eb !important;
+      color: #dbeafe;
+      box-shadow: inset 0 0 0 1px rgba(191, 219, 254, 0.44), 0 0 14px rgba(37, 99, 235, 0.48);
+      transform: scale(0.94);
+    }
+
+    .frontier {
+      background: #facc15 !important;
+      color: #241a00;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.42), 0 0 18px rgba(250, 204, 21, 0.58);
+    }
+
+    .path {
+      background: #22c55e !important;
+      color: #03220e;
+      box-shadow: inset 0 0 0 3px rgba(240, 253, 244, 0.82), 0 0 24px rgba(34, 197, 94, 0.78);
+      transform: scale(1.06);
+    }
+
+    .start {
+      background: var(--cyan) !important;
+      color: #061014;
+      box-shadow: 0 0 22px rgba(47, 243, 255, 0.72);
+    }
+
+    .goal {
+      background: var(--red) !important;
+      color: #17060a;
+      box-shadow: 0 0 22px rgba(255, 95, 122, 0.7);
+    }
+
+    .mini-grid .cell {
+      border-radius: 3px;
+      font-size: 7px;
+    }
+
+    .cell-label {
+      display: none;
+    }
+
+    .statusbar {
+      border-top: 1px solid rgba(143, 167, 183, 0.15);
+      padding-top: 12px;
+    }
+
+    .code-line {
+      color: var(--muted);
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (min-width: 901px) {
+      .app {
+        height: 100vh;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .sidebar,
+      .stage {
+        min-height: 0;
+        max-height: calc(100vh - 36px);
+      }
+
+      .sidebar {
+        overflow: hidden;
+      }
+
+      .sidebar-body {
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding-right: 5px;
+        scrollbar-gutter: stable;
+      }
+
+      .grid-wrap {
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+      }
+    }
+
+    @media (min-width: 901px) and (max-width: 1180px) {
+      .stage-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-telemetry .label {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        order: 2;
+      }
+
+      .stage {
+        min-height: 68vh;
+      }
+
+      .stage-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-telemetry .label {
+        text-align: left;
+      }
+
+      .grid {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        padding: 10px;
+      }
+
+      .tabs, .actions, .readout {
+        grid-template-columns: 1fr;
+      }
+
+      .tools {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .compare-wrap {
+        grid-template-columns: 1fr !important;
+      }
+
+      .topbar, .statusbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar {
+        width: 100%;
+      }
+
+      .topbar-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .stage-telemetry .readout {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .average-live {
+        grid-template-columns: 1fr;
+      }
+
+      .brand h1 {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="appShell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-copy">
+          <h1>Cyber Network Pathfinder</h1>
+          <p>같은 네트워크 맵에서 BFS, DFS, 다익스트라, A*의 탐색 방식 차이를 애니메이션으로 비교합니다.</p>
+        </div>
+        <button class="collapse-btn" id="sidebarToggle" title="설정 패널 접기/펼치기">‹</button>
+      </div>
+
+      <div class="quick-controls" aria-label="접힌 패널 실행 컨트롤">
+        <button class="icon-btn" id="quickRunBtn" title="실행">▶</button>
+        <button class="icon-btn" id="quickPauseBtn" title="일시정지/계속">Ⅱ</button>
+        <button class="icon-btn" id="quickMazeBtn" title="랜덤 벽">▦</button>
+        <button class="icon-btn" id="quickClearBtn" title="초기화">↺</button>
+      </div>
+      <div class="quick-summary" id="quickSummary" aria-label="접힌 패널 설정 요약"></div>
+
+      <div class="sidebar-body">
+      <div class="settings-browser">
+        <input class="settings-search" id="settingsSearch" type="search" placeholder="설정 검색" aria-label="설정 검색">
+        <div class="settings-categories" id="settingsCategories" aria-label="설정 분류">
+          <button class="icon-btn active" data-settings-category="all">전체</button>
+          <button class="icon-btn" data-settings-category="view">보기</button>
+          <button class="icon-btn" data-settings-category="run">실행</button>
+          <button class="icon-btn" data-settings-category="map">맵</button>
+          <button class="icon-btn" data-settings-category="limit">제한</button>
+          <button class="icon-btn" data-settings-category="history">기록</button>
+        </div>
+      </div>
+      <div class="settings-empty" id="settingsEmpty">일치하는 설정이 없습니다.</div>
+
+      <section class="section" data-settings-group="view">
+        <div class="label">보기 방식</div>
+        <div class="segmented">
+          <button class="icon-btn active" id="singleViewBtn">개별</button>
+          <button class="icon-btn" id="compareViewBtn">비교</button>
+          <button class="icon-btn" id="averageViewBtn">평균</button>
+        </div>
+        <div class="compare-selection hidden" id="compareSelection">
+          <div class="slider-head">
+            <span>비교 알고리즘</span>
+            <strong id="compareSelectionCount">4개 선택</strong>
+          </div>
+          <div class="compare-selection-options">
+            <label class="check-row"><input type="checkbox" data-compare-algorithm="bfs" checked>BFS</label>
+            <label class="check-row"><input type="checkbox" data-compare-algorithm="dfs" checked>DFS</label>
+            <label class="check-row"><input type="checkbox" data-compare-algorithm="dijkstra" checked>Dijkstra</label>
+            <label class="check-row"><input type="checkbox" data-compare-algorithm="astar" checked>A*</label>
+          </div>
+        </div>
+        <div class="slider-row hidden" id="repeatControls">
+          <div class="slider-head">
+            <span>연속 실행</span>
+            <strong id="repeatLabel">20회</strong>
+          </div>
+          <input id="repeatRange" type="range" min="1" max="1000" value="20">
+        </div>
+      </section>
+
+      <section class="section" id="algorithmSection" data-settings-group="view">
+        <div class="label">알고리즘</div>
+        <div class="tabs" id="algorithmTabs"></div>
+      </section>
+
+      <section class="section" data-settings-group="run">
+        <div class="label">실행 제어</div>
+        <div class="actions">
+          <button class="btn primary" id="runBtn">실행</button>
+          <button class="btn" id="pauseBtn">일시정지</button>
+          <button class="btn" id="mazeBtn">랜덤 벽</button>
+          <button class="btn danger" id="clearBtn">초기화</button>
+        </div>
+        <div class="settings-summary" id="runSummary"></div>
+      </section>
+
+      <section class="section" data-settings-group="map">
+        <div class="label">맵 설정</div>
+        <label class="check-row">
+          <input id="gridSizeToggle" type="checkbox">
+          칸 수 커스텀
+          <span class="inline-note">기본 24×16</span>
+        </label>
+        <div class="limit-controls hidden" id="gridSizeControls">
+          <div class="segmented">
+            <button class="icon-btn active" id="gridCustomBtn">칸 사용자 지정</button>
+            <button class="icon-btn" id="gridRandomBtn">칸 랜덤</button>
+          </div>
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>열 개수</span>
+              <strong id="colsLabel">24</strong>
+            </div>
+            <input id="colsRange" type="range" min="8" max="40" value="24">
+          </div>
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>행 개수</span>
+              <strong id="rowsLabel">16</strong>
+            </div>
+            <input id="rowsRange" type="range" min="6" max="30" value="16">
+          </div>
+          <button class="btn" id="rerollGridBtn">칸 수 다시</button>
+        </div>
+        <label class="check-row">
+          <input id="wallTargetToggle" type="checkbox">
+          벽 설정 커스텀
+          <span class="inline-note">기본 100</span>
+        </label>
+        <div class="limit-controls hidden" id="wallTargetControls">
+          <div class="segmented">
+            <button class="icon-btn active" id="wallCountModeBtn">개수</button>
+            <button class="icon-btn" id="wallRatioModeBtn">비율</button>
+          </div>
+          <div class="slider-row">
+            <div class="slider-head">
+              <span id="wallTargetTitle">벽 개수</span>
+              <strong id="wallTargetLabel">100</strong>
+            </div>
+            <input id="wallRange" type="range" min="0" max="300" value="100">
+          </div>
+        </div>
+        <button class="btn" id="mazePresetBtn">미로 생성</button>
+        <div class="segmented">
+          <button class="icon-btn active" id="manualPointsBtn">고정 시작/끝</button>
+          <button class="icon-btn" id="randomPointsBtn">랜덤 시작/끝</button>
+        </div>
+        <button class="btn" id="rerollPointsBtn">시작/끝 다시</button>
+        <label class="check-row">
+          <input id="weightToggle" type="checkbox" checked>
+          가중치 사용
+        </label>
+        <button class="btn" id="weightsBtn">가중치 다시</button>
+        <label class="check-row">
+          <input id="diagonalToggle" type="checkbox">
+          대각선 이동
+          <span class="inline-note">기본 비활성화</span>
+        </label>
+      </section>
+
+      <section class="section" data-settings-group="limit">
+        <div class="label">제한 조건</div>
+        <label class="check-row">
+          <input id="timeLimitToggle" type="checkbox">
+          시간 제한 사용
+          <span class="tip" title="추천: 2500~5000ms. 낮게 잡으면 A*처럼 목표 방향으로 빠르게 가는 알고리즘이 유리해집니다.">?</span>
+        </label>
+        <div class="limit-controls hidden" id="timeLimitControls">
+          <div class="segmented">
+            <button class="icon-btn active" id="timeCustomBtn">사용자 지정</button>
+            <button class="icon-btn" id="timeRandomBtn">랜덤</button>
+          </div>
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>시간 제한</span>
+              <strong id="timeLimitLabel">3000ms</strong>
+            </div>
+            <input id="timeLimitRange" type="range" min="500" max="12000" step="100" value="3000">
+          </div>
+        </div>
+        <label class="check-row">
+          <input id="energyLimitToggle" type="checkbox">
+          에너지 제한 사용
+          <span class="tip" title="추천: 60~120. 낮게 잡으면 비용이 싼 경로를 찾는 Dijkstra와 A*가 유리해집니다.">?</span>
+        </label>
+        <div class="limit-controls hidden" id="energyLimitControls">
+          <div class="segmented">
+            <button class="icon-btn active" id="energyCustomBtn">사용자 지정</button>
+            <button class="icon-btn" id="energyRandomBtn">랜덤</button>
+          </div>
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>에너지 제한</span>
+              <strong id="energyLimitLabel">80</strong>
+            </div>
+            <input id="energyLimitRange" type="range" min="10" max="250" value="80">
+          </div>
+        </div>
+        <label class="check-row">
+          <input id="stepLimitToggle" type="checkbox">
+          스텝 제한 사용
+          <span class="tip" title="추천: 80~180. 낮게 잡으면 넓게 퍼지는 BFS나 깊게 헤매는 DFS가 실패하기 쉬워집니다.">?</span>
+        </label>
+        <div class="limit-controls hidden" id="stepLimitControls">
+          <div class="segmented">
+            <button class="icon-btn active" id="stepCustomBtn">사용자 지정</button>
+            <button class="icon-btn" id="stepRandomBtn">랜덤</button>
+          </div>
+          <div class="slider-row">
+            <div class="slider-head">
+              <span>스텝 제한</span>
+              <strong id="stepLimitLabel">160</strong>
+            </div>
+            <input id="stepLimitRange" type="range" min="10" max="384" value="160">
+          </div>
+        </div>
+      </section>
+
+      <section class="section" data-settings-group="map">
+        <div class="label">맵 직접 편집</div>
+        <div class="tools">
+          <button class="icon-btn active" id="wallTool" title="칸을 눌러 벽을 추가하거나 제거합니다">벽</button>
+          <button class="icon-btn" id="startTool" title="칸을 눌러 시작점을 옮깁니다">시작점</button>
+          <button class="icon-btn" id="goalTool" title="칸을 눌러 도착점을 옮깁니다">도착점</button>
+          <button class="icon-btn" id="weightTool" title="칸을 눌러 이동 비용을 1부터 9까지 변경합니다">가중치</button>
+        </div>
+        <div class="tool-help" id="toolHelp">벽: 칸을 눌러 벽을 추가하거나 제거합니다.</div>
+      </section>
+
+      <section class="section" data-settings-group="history">
+        <div class="label">실행 기록</div>
+        <div class="history-group">
+          <div class="label">최근 기록 · 최대 20개</div>
+          <select class="history-select" id="historySelect" aria-label="최근 실행 기록">
+            <option value="">최근 기록 없음</option>
+          </select>
+        </div>
+        <div class="history-group">
+          <div class="label">보관된 기록</div>
+          <select class="history-select" id="keptHistorySelect" aria-label="보관된 실행 기록">
+            <option value="">보관된 기록 없음</option>
+          </select>
+        </div>
+        <div class="history-actions">
+          <button class="btn" id="loadHistoryBtn" disabled>불러오기</button>
+          <button class="btn" id="saveHistoryBtn" disabled>보관</button>
+          <button class="btn danger" id="deleteHistoryBtn" disabled>삭제</button>
+        </div>
+        <div class="history-detail" id="historyDetail">실행 결과는 자동 저장되며 일반 기록은 최신 20개까지 유지됩니다.</div>
+      </section>
+
+      <section class="section" data-settings-group="view">
+        <div class="label">색상 안내</div>
+        <div class="legend">
+          <div class="legend-row"><span class="swatch" style="background: var(--cyan)"></span> 시작점</div>
+          <div class="legend-row"><span class="swatch" style="background: var(--red)"></span> 목표점</div>
+          <div class="legend-row"><span class="swatch" style="background: #d8e2ea"></span> 벽</div>
+          <div class="legend-row"><span class="swatch" style="background: #2563eb"></span> 탐색 완료</div>
+          <div class="legend-row"><span class="swatch" style="background: #facc15"></span> 다음 후보</div>
+          <div class="legend-row"><span class="swatch" style="background: #22c55e"></span> 최종 경로</div>
+          <div class="legend-row"><span class="swatch" style="background: #5d4531"></span> 숫자 = 이동 비용</div>
+        </div>
+      </section>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <div class="topbar">
+        <div>
+          <h2 id="algorithmTitle">BFS</h2>
+          <div class="status" id="algorithmDesc">가까운 칸부터 파동처럼 퍼져나갑니다.</div>
+        </div>
+        <div class="topbar-actions">
+          <div class="zoom-controls" aria-label="화면 확대 축소">
+            <button class="icon-btn" id="zoomOutBtn" title="축소" aria-label="축소">−</button>
+            <button class="icon-btn zoom-value" id="zoomResetBtn" title="기본 배율로 복원">100%</button>
+            <button class="icon-btn" id="zoomInBtn" title="확대" aria-label="확대">+</button>
+          </div>
+          <div class="badge" id="stateBadge">준비</div>
+          <button class="icon-btn settings-btn" id="settingsBtn" title="환경 설정" aria-label="환경 설정">⚙</button>
+        </div>
+      </div>
+
+      <aside class="settings-panel" id="settingsPanel" aria-label="환경 설정">
+        <div class="settings-head">
+          <h3 id="settingsTitle">환경 설정</h3>
+          <button class="icon-btn" id="settingsCloseBtn" title="닫기" aria-label="닫기">×</button>
+        </div>
+        <div class="settings-group">
+          <label for="themeSelect" id="themeSettingLabel">배경 테마</label>
+          <select class="setting-select" id="themeSelect">
+            <option value="dark">블랙</option>
+            <option value="light">화이트</option>
+          </select>
+        </div>
+        <div class="settings-group">
+          <label for="languageSelect" id="languageSettingLabel">언어</label>
+          <select class="setting-select" id="languageSelect">
+            <option value="ko">한국어</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="settings-group">
+          <label for="speedSelect" id="speedSettingLabel">시각화 속도</label>
+          <select class="setting-select" id="speedSelect">
+            <option value="8">빠르게</option>
+            <option value="18">보통</option>
+            <option value="40">느리게</option>
+          </select>
+        </div>
+        <label class="check-row">
+          <input id="effectsToggle" type="checkbox" checked>
+          <span id="effectsSettingLabel">빛 효과와 전환 사용</span>
+        </label>
+        <label class="check-row">
+          <input id="telemetryToggle" type="checkbox" checked>
+          <span id="telemetrySettingLabel">실행 정보 표시</span>
+        </label>
+        <label class="check-row">
+          <input id="autoHistoryToggle" type="checkbox" checked>
+          <span id="historySettingLabel">실행 기록 자동 저장</span>
+        </label>
+        <button class="btn danger" id="resetPreferencesBtn">환경 설정 초기화</button>
+        <div class="settings-note" id="settingsNote">환경 설정은 이 브라우저에 자동 저장됩니다.</div>
+      </aside>
+
+      <div class="grid-wrap">
+        <div class="zoom-canvas" id="zoomCanvas">
+          <div class="grid" id="grid" aria-label="algorithm grid"></div>
+          <div class="compare-wrap" id="compareWrap" aria-label="algorithm comparison"></div>
+          <div class="average-panel" id="averagePanel" aria-label="average benchmark">
+            <div class="average-live">
+              <div class="average-preview" id="averagePreview" aria-label="평균 실행 미리보기"></div>
+              <div class="average-progress">
+                <strong id="averageProgressTitle">실행 전</strong>
+                <div class="status" id="averageProgressText">평균 실행을 시작하면 빠른 미리보기가 표시됩니다.</div>
+                <div class="average-progress-track">
+                  <div class="average-progress-fill" id="averageProgressFill"></div>
+                </div>
+              </div>
+            </div>
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>순위</th>
+                  <th>알고리즘</th>
+                  <th>성공률</th>
+                  <th>평균 탐색 칸</th>
+                  <th>평균 길이</th>
+                  <th>평균 비용</th>
+                  <th>평균 시간</th>
+                  <th>주요 실패</th>
+                </tr>
+              </thead>
+              <tbody id="averageBody"></tbody>
+            </table>
+            <p class="average-note" id="averageNote">평균 모드에서 실행을 누르면 랜덤 맵을 여러 번 계산합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-bottom">
+        <div class="statusbar">
+          <div class="code-line" id="codeLine">queue.push(start)</div>
+          <div class="status" id="hint">칸을 클릭해 벽을 만들고 실행하세요.</div>
+        </div>
+        <section class="stage-telemetry" id="stageTelemetry" aria-label="실행 측정값">
+          <div class="label">실행 정보</div>
+          <div class="readout">
+            <div class="metric"><span>탐색한 칸</span><strong id="visitedCount">0</strong></div>
+            <div class="metric"><span>경로 길이</span><strong id="pathCount">0</strong></div>
+            <div class="metric"><span>경로 비용</span><strong id="pathCost">0</strong></div>
+            <div class="metric"><span>벽 개수</span><strong id="wallCount">0</strong></div>
+            <div class="metric"><span>걸린 시간</span><strong id="timeCount">0ms (0.00초)</strong></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const defaultRows = 16;
+    const defaultCols = 24;
+    const defaultWallTarget = 100;
+    const performanceProfile = Object.freeze({
+      largeGridCells: 650,
+      batchThresholds: Object.freeze([
+        Object.freeze({ cells: 1000, size: 4 }),
+        Object.freeze({ cells: 650, size: 3 }),
+        Object.freeze({ cells: 400, size: 2 })
+      ]),
+      visualSlowdown: 1.3
+    });
+    let rows = defaultRows;
+    let cols = defaultCols;
+    let animationDelay = 18;
+    let currentStart = defaultStart();
+    let currentGoal = defaultGoal();
+    let algorithm = "bfs";
+    let viewMode = "single";
+    let activeSettingsCategory = "all";
+    let pointsMode = "manual";
+    let gridSizeMode = "custom";
+    let useGridSizeSettings = false;
+    let useWallTargetSettings = false;
+    let tool = "wall";
+    let weightsEnabled = true;
+    let diagonalMovement = false;
+    let running = false;
+    let paused = false;
+    let timer = null;
+    let walls = new Set();
+    let wallTarget = defaultWallTarget;
+    let wallTargetMode = "count";
+    let wallRatio = 25;
+    let repeatCount = 20;
+    let useTimeLimit = false;
+    let timeLimitMs = 3000;
+    let useEnergyLimit = false;
+    let energyLimit = 80;
+    let useStepLimit = false;
+    let stepLimit = 160;
+    let timeLimitMode = "custom";
+    let energyLimitMode = "custom";
+    let stepLimitMode = "custom";
+    let weights = new Map();
+    let visitedCells = new Set();
+    let frontierCells = new Set();
+    let pathCells = new Set();
+    let compareRuns = {};
+    let selectedCompareAlgorithms = new Set(["bfs", "dfs", "dijkstra", "astar"]);
+    let runStartTime = 0;
+    let elapsedMs = 0;
+    let averageRunToken = 0;
+    let latestSnapshot = null;
+    let executionHistory = [];
+    const historyStorageKey = "cyber-pathfinder-history-v1";
+    const preferencesStorageKey = "cyber-pathfinder-preferences-v1";
+    const defaultPreferences = {
+      theme: "dark",
+      language: "ko",
+      speed: 18,
+      effects: true,
+      telemetry: true,
+      autoHistory: true,
+      zoom: 100
+    };
+    let preferences = { ...defaultPreferences };
+
+    const algorithms = {
+      bfs: {
+        title: "BFS",
+        desc: "가까운 칸부터 파동처럼 퍼져나갑니다.",
+        descEn: "Expands outward from the nearest cells first.",
+        code: "queue.shift() -> neighbors -> queue.push()"
+      },
+      dfs: {
+        title: "DFS",
+        desc: "한 방향으로 깊게 침투하다가 막히면 되돌아옵니다.",
+        descEn: "Explores deeply in one direction, then backtracks.",
+        code: "stack.pop() -> deep dive -> backtrack"
+      },
+      dijkstra: {
+        title: "Dijkstra",
+        desc: "칸마다 다른 이동 비용을 보고 가장 싼 경로를 찾습니다.",
+        descEn: "Finds the cheapest route using each cell's movement cost.",
+        code: "pick lowest distance -> relax neighbors"
+      },
+      astar: {
+        title: "A*",
+        desc: "칸 비용과 목표까지의 예상 거리를 함께 봅니다.",
+        descEn: "Combines movement cost with estimated distance to the goal.",
+        code: "f(n) = g(n) + h(n)"
+      }
+    };
+
+    const grid = document.getElementById("grid");
+    const settingsSearch = document.getElementById("settingsSearch");
+    const settingsCategories = document.getElementById("settingsCategories");
+    const settingsEmpty = document.getElementById("settingsEmpty");
+    const settingsSections = [...document.querySelectorAll("[data-settings-group]")];
+    const mazePresetBtn = document.getElementById("mazePresetBtn");
+    const compareWrap = document.getElementById("compareWrap");
+    const compareSelection = document.getElementById("compareSelection");
+    const compareSelectionCount = document.getElementById("compareSelectionCount");
+    const compareAlgorithmInputs = [...document.querySelectorAll("[data-compare-algorithm]")];
+    const averagePanel = document.getElementById("averagePanel");
+    const gridWrap = document.querySelector(".grid-wrap");
+    const averageBody = document.getElementById("averageBody");
+    const averageNote = document.getElementById("averageNote");
+    const averagePreview = document.getElementById("averagePreview");
+    const averageProgressTitle = document.getElementById("averageProgressTitle");
+    const averageProgressText = document.getElementById("averageProgressText");
+    const averageProgressFill = document.getElementById("averageProgressFill");
+    const algorithmSection = document.getElementById("algorithmSection");
+    const algorithmTabs = document.getElementById("algorithmTabs");
+    const visitedCount = document.getElementById("visitedCount");
+    const pathCount = document.getElementById("pathCount");
+    const pathCost = document.getElementById("pathCost");
+    const wallCount = document.getElementById("wallCount");
+    const timeCount = document.getElementById("timeCount");
+    const rowsRange = document.getElementById("rowsRange");
+    const colsRange = document.getElementById("colsRange");
+    const rowsLabel = document.getElementById("rowsLabel");
+    const colsLabel = document.getElementById("colsLabel");
+    const wallRange = document.getElementById("wallRange");
+    const wallTargetLabel = document.getElementById("wallTargetLabel");
+    const wallTargetTitle = document.getElementById("wallTargetTitle");
+    const wallCountModeBtn = document.getElementById("wallCountModeBtn");
+    const wallRatioModeBtn = document.getElementById("wallRatioModeBtn");
+    const gridSizeToggle = document.getElementById("gridSizeToggle");
+    const gridSizeControls = document.getElementById("gridSizeControls");
+    const wallTargetToggle = document.getElementById("wallTargetToggle");
+    const wallTargetControls = document.getElementById("wallTargetControls");
+    const repeatRange = document.getElementById("repeatRange");
+    const repeatLabel = document.getElementById("repeatLabel");
+    const repeatControls = document.getElementById("repeatControls");
+    const manualPointsBtn = document.getElementById("manualPointsBtn");
+    const randomPointsBtn = document.getElementById("randomPointsBtn");
+    const weightToggle = document.getElementById("weightToggle");
+    const diagonalToggle = document.getElementById("diagonalToggle");
+    const weightsBtn = document.getElementById("weightsBtn");
+    const weightTool = document.getElementById("weightTool");
+    const toolHelp = document.getElementById("toolHelp");
+    const gridCustomBtn = document.getElementById("gridCustomBtn");
+    const gridRandomBtn = document.getElementById("gridRandomBtn");
+    const rerollGridBtn = document.getElementById("rerollGridBtn");
+    const appShell = document.getElementById("appShell");
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const timeCustomBtn = document.getElementById("timeCustomBtn");
+    const timeRandomBtn = document.getElementById("timeRandomBtn");
+    const energyCustomBtn = document.getElementById("energyCustomBtn");
+    const energyRandomBtn = document.getElementById("energyRandomBtn");
+    const stepCustomBtn = document.getElementById("stepCustomBtn");
+    const stepRandomBtn = document.getElementById("stepRandomBtn");
+    const timeLimitToggle = document.getElementById("timeLimitToggle");
+    const timeLimitControls = document.getElementById("timeLimitControls");
+    const timeLimitRange = document.getElementById("timeLimitRange");
+    const timeLimitLabel = document.getElementById("timeLimitLabel");
+    const energyLimitToggle = document.getElementById("energyLimitToggle");
+    const energyLimitControls = document.getElementById("energyLimitControls");
+    const energyLimitRange = document.getElementById("energyLimitRange");
+    const energyLimitLabel = document.getElementById("energyLimitLabel");
+    const stepLimitToggle = document.getElementById("stepLimitToggle");
+    const stepLimitControls = document.getElementById("stepLimitControls");
+    const stepLimitRange = document.getElementById("stepLimitRange");
+    const stepLimitLabel = document.getElementById("stepLimitLabel");
+    const stateBadge = document.getElementById("stateBadge");
+    const codeLine = document.getElementById("codeLine");
+    const hint = document.getElementById("hint");
+    const runSummary = document.getElementById("runSummary");
+    const quickSummary = document.getElementById("quickSummary");
+    const saveHistoryBtn = document.getElementById("saveHistoryBtn");
+    const historySelect = document.getElementById("historySelect");
+    const keptHistorySelect = document.getElementById("keptHistorySelect");
+    const loadHistoryBtn = document.getElementById("loadHistoryBtn");
+    const deleteHistoryBtn = document.getElementById("deleteHistoryBtn");
+    const historyDetail = document.getElementById("historyDetail");
+    const algorithmTitle = document.getElementById("algorithmTitle");
+    const algorithmDesc = document.getElementById("algorithmDesc");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsPanel = document.getElementById("settingsPanel");
+    const settingsCloseBtn = document.getElementById("settingsCloseBtn");
+    const themeSelect = document.getElementById("themeSelect");
+    const languageSelect = document.getElementById("languageSelect");
+    const speedSelect = document.getElementById("speedSelect");
+    const effectsToggle = document.getElementById("effectsToggle");
+    const telemetryToggle = document.getElementById("telemetryToggle");
+    const autoHistoryToggle = document.getElementById("autoHistoryToggle");
+    const resetPreferencesBtn = document.getElementById("resetPreferencesBtn");
+    const stageTelemetry = document.getElementById("stageTelemetry");
+    const zoomOutBtn = document.getElementById("zoomOutBtn");
+    const zoomResetBtn = document.getElementById("zoomResetBtn");
+    const zoomInBtn = document.getElementById("zoomInBtn");
+    const zoomCanvas = document.getElementById("zoomCanvas");
+
+    const translationPairs = [
+      ["보기 방식", "View"],
+      ["설정 검색", "Search settings"],
+      ["전체", "All"],
+      ["보기", "View"],
+      ["실행", "Run"],
+      ["맵", "Map"],
+      ["제한", "Limits"],
+      ["기록", "History"],
+      ["일치하는 설정이 없습니다.", "No matching settings."],
+      ["개별", "Single"],
+      ["비교", "Compare"],
+      ["4개 비교", "Compare 4"],
+      ["평균", "Average"],
+      ["비교 알고리즘", "Compare algorithms"],
+      ["연속 실행", "Repeat runs"],
+      ["알고리즘", "Algorithm"],
+      ["실행 제어", "Controls"],
+      ["실행", "Run"],
+      ["일시정지", "Pause"],
+      ["랜덤 벽", "Random walls"],
+      ["미로 생성", "Generate maze"],
+      ["초기화", "Reset"],
+      ["맵 설정", "Map settings"],
+      ["칸 수 커스텀", "Custom grid size"],
+      ["칸 사용자 지정", "Custom"],
+      ["칸 랜덤", "Random"],
+      ["열 개수", "Columns"],
+      ["행 개수", "Rows"],
+      ["칸 수 다시", "Reroll grid"],
+      ["벽 설정 커스텀", "Custom wall settings"],
+      ["벽 개수", "Walls"],
+      ["개수", "Count"],
+      ["비율", "Ratio"],
+      ["벽 비율", "Wall ratio"],
+      ["고정 시작/끝", "Fixed start/end"],
+      ["랜덤 시작/끝", "Random start/end"],
+      ["시작/끝 다시", "Reroll start/end"],
+      ["가중치 사용", "Use weights"],
+      ["가중치 다시", "Reroll weights"],
+      ["대각선 이동", "Diagonal movement"],
+      ["기본 비활성화", "Off by default"],
+      ["제한 조건", "Constraints"],
+      ["시간 제한 사용", "Use time limit"],
+      ["에너지 제한 사용", "Use energy limit"],
+      ["스텝 제한 사용", "Use step limit"],
+      ["사용자 지정", "Custom"],
+      ["랜덤", "Random"],
+      ["맵 직접 편집", "Edit map"],
+      ["벽", "Wall"],
+      ["시작점", "Start"],
+      ["도착점", "Goal"],
+      ["가중치", "Weight"],
+      ["실행 기록", "Run history"],
+      ["최근 기록 · 최대 20개", "Recent · max 20"],
+      ["보관된 기록", "Kept records"],
+      ["불러오기", "Load"],
+      ["보관", "Keep"],
+      ["삭제", "Delete"],
+      ["색상 안내", "Legend"],
+      ["실행 정보", "Telemetry"],
+      ["탐색한 칸", "Explored cells"],
+      ["경로 길이", "Path length"],
+      ["경로 비용", "Path cost"],
+      ["걸린 시간", "Elapsed"],
+      ["순위", "Rank"],
+      ["성공률", "Success"],
+      ["평균 탐색 칸", "Avg. explored"],
+      ["평균 길이", "Avg. length"],
+      ["평균 비용", "Avg. cost"],
+      ["평균 시간", "Avg. time"],
+      ["주요 실패", "Main failure"]
+      ,["같은 네트워크 맵에서 BFS, DFS, 다익스트라, A*의 탐색 방식 차이를 애니메이션으로 비교합니다.", "Compare BFS, DFS, Dijkstra, and A* on the same animated network map."]
+      ,["기본 24×16", "Default 24×16"]
+      ,["기본 100", "Default 100"]
+      ,["시간 제한", "Time limit"]
+      ,["에너지 제한", "Energy limit"]
+      ,["스텝 제한", "Step limit"]
+      ,["벽: 칸을 눌러 벽을 추가하거나 제거합니다.", "Wall: click a cell to add or remove a wall."]
+      ,["최근 기록 없음", "No recent records"]
+      ,["보관된 기록 없음", "No kept records"]
+      ,["실행 결과는 자동 저장되며 일반 기록은 최신 20개까지 유지됩니다.", "Runs are saved automatically. Up to 20 recent records are kept."]
+      ,["탐색 완료", "Visited"]
+      ,["다음 후보", "Frontier"]
+      ,["최종 경로", "Final path"]
+      ,["숫자 = 이동 비용", "Number = movement cost"]
+      ,["목표점", "Goal"]
+      ,["준비", "Ready"]
+      ,["실행 중", "Running"]
+      ,["일시정지", "Paused"]
+      ,["계속", "Continue"]
+      ,["비교 중", "Comparing"]
+      ,["비교 완료", "Comparison complete"]
+      ,["평균 계산 중", "Calculating averages"]
+      ,["평균 완료", "Average complete"]
+      ,["기록 불러옴", "Record loaded"]
+      ,["보관 해제", "Unkeep"]
+      ,["평균 모드에서 실행을 누르면 랜덤 맵을 여러 번 계산합니다.", "Run Average mode to calculate multiple random maps."]
+      ,["칸을 클릭해 벽을 만들고 실행하세요.", "Click cells to add walls, then run the algorithm."]
+      ,["실행 전", "Not started"]
+      ,["평균 실행을 시작하면 빠른 미리보기가 표시됩니다.", "A fast preview appears when the average run starts."]
+    ];
+
+    function translateLeafText(language) {
+      const index = language === "en" ? 1 : 0;
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = walker.nextNode())) {
+        const text = node.nodeValue.trim();
+        if (!text) continue;
+        const pair = translationPairs.find(item => item[0] === text || item[1] === text);
+        if (pair) node.nodeValue = node.nodeValue.replace(text, pair[index]);
+      }
+    }
+
+    function tr(korean, english) {
+      return preferences.language === "en" ? english : korean;
+    }
+
+    function applyLanguage() {
+      const english = preferences.language === "en";
+      document.documentElement.lang = english ? "en" : "ko";
+      translateLeafText(preferences.language);
+      settingsSearch.placeholder = english ? "Search settings" : "설정 검색";
+      document.getElementById("settingsTitle").textContent = english ? "Preferences" : "환경 설정";
+      document.getElementById("themeSettingLabel").textContent = english ? "Theme" : "배경 테마";
+      document.getElementById("languageSettingLabel").textContent = english ? "Language" : "언어";
+      document.getElementById("speedSettingLabel").textContent = english ? "Visualization speed" : "시각화 속도";
+      document.getElementById("effectsSettingLabel").textContent = english ? "Use glow and transitions" : "빛 효과와 전환 사용";
+      document.getElementById("telemetrySettingLabel").textContent = english ? "Show telemetry" : "실행 정보 표시";
+      document.getElementById("historySettingLabel").textContent = english ? "Auto-save run history" : "실행 기록 자동 저장";
+      document.getElementById("settingsNote").textContent = english
+        ? "Preferences are saved in this browser."
+        : "환경 설정은 이 브라우저에 자동 저장됩니다.";
+      resetPreferencesBtn.textContent = english ? "Reset preferences" : "환경 설정 초기화";
+      themeSelect.options[0].textContent = english ? "Black" : "블랙";
+      themeSelect.options[1].textContent = english ? "White" : "화이트";
+      languageSelect.options[0].textContent = english ? "Korean" : "한국어";
+      languageSelect.options[1].textContent = "English";
+      speedSelect.options[0].textContent = english ? "Fast" : "빠르게";
+      speedSelect.options[1].textContent = english ? "Normal" : "보통";
+      speedSelect.options[2].textContent = english ? "Slow" : "느리게";
+      settingsBtn.title = english ? "Preferences" : "환경 설정";
+      settingsBtn.setAttribute("aria-label", settingsBtn.title);
+      settingsCloseBtn.title = english ? "Close" : "닫기";
+      settingsCloseBtn.setAttribute("aria-label", settingsCloseBtn.title);
+      zoomOutBtn.title = english ? "Zoom out" : "축소";
+      zoomOutBtn.setAttribute("aria-label", zoomOutBtn.title);
+      zoomInBtn.title = english ? "Zoom in" : "확대";
+      zoomInBtn.setAttribute("aria-label", zoomInBtn.title);
+      zoomResetBtn.title = english ? "Reset zoom" : "기본 배율로 복원";
+      zoomResetBtn.setAttribute("aria-label", zoomResetBtn.title);
+      document.querySelector(".zoom-controls").setAttribute("aria-label", english ? "Zoom controls" : "화면 확대 축소");
+      sidebarToggle.title = english ? "Collapse or expand settings" : "설정 패널 접기/펼치기";
+      document.querySelector(".brand p").textContent = english
+        ? "Compare BFS, DFS, Dijkstra, and A* on the same animated network map."
+        : "같은 네트워크 맵에서 BFS, DFS, 다익스트라, A*의 탐색 방식 차이를 애니메이션으로 비교합니다.";
+      document.querySelectorAll(".tip")[0].title = english
+        ? "Recommended: 2500–5000ms. Lower values favor algorithms that move quickly toward the goal, such as A*."
+        : "추천: 2500~5000ms. 낮게 잡으면 A*처럼 목표 방향으로 빠르게 가는 알고리즘이 유리해집니다.";
+      document.querySelectorAll(".tip")[1].title = english
+        ? "Recommended: 60–120. Lower values favor Dijkstra and A*, which seek cheaper routes."
+        : "추천: 60~120. 낮게 잡으면 비용이 싼 경로를 찾는 Dijkstra와 A*가 유리해집니다.";
+      document.querySelectorAll(".tip")[2].title = english
+        ? "Recommended: 80–180. Lower values make BFS and wandering DFS runs more likely to fail."
+        : "추천: 80~180. 낮게 잡으면 넓게 퍼지는 BFS나 깊게 헤매는 DFS가 실패하기 쉬워집니다.";
+      document.getElementById("wallTool").title = english ? "Click a cell to add or remove a wall" : "칸을 눌러 벽을 추가하거나 제거합니다";
+      document.getElementById("startTool").title = english ? "Click a cell to move the start point" : "칸을 눌러 시작점을 옮깁니다";
+      document.getElementById("goalTool").title = english ? "Click a cell to move the goal point" : "칸을 눌러 도착점을 옮깁니다";
+      weightTool.title = english ? "Click a cell to cycle its movement cost from 1 to 9" : "칸을 눌러 이동 비용을 1부터 9까지 변경합니다";
+      for (const label of document.querySelectorAll(".slider-head strong")) {
+        label.title = english ? "Click to enter a number" : "클릭해서 숫자 입력";
+      }
+      document.getElementById("quickRunBtn").title = english ? "Run" : "실행";
+      document.getElementById("quickPauseBtn").title = english ? "Pause or continue" : "일시정지/계속";
+      document.getElementById("quickMazeBtn").title = english ? "Random walls" : "랜덤 벽";
+      document.getElementById("quickClearBtn").title = english ? "Reset" : "초기화";
+      historySelect.setAttribute("aria-label", english ? "Recent run history" : "최근 실행 기록");
+      keptHistorySelect.setAttribute("aria-label", english ? "Kept run history" : "보관된 실행 기록");
+      stageTelemetry.setAttribute("aria-label", english ? "Run telemetry" : "실행 측정값");
+      const selectedHistoryId = selectedHistoryEntry()?.id ?? "";
+      setTool(tool);
+      updateRunSummary();
+      renderHistoryOptions(selectedHistoryId);
+      if (selectedHistoryId) {
+        historyDetail.textContent = resultSummaryText(selectedHistoryEntry());
+      } else if (latestSnapshot) {
+        historyDetail.textContent = `${tr("현재 결과", "Current result")}: ${resultSummaryText(latestSnapshot)}`;
+      } else {
+        historyDetail.textContent = tr(
+          "실행 결과는 자동 저장되며 일반 기록은 최신 20개까지 유지됩니다.",
+          "Runs are saved automatically. Up to 20 recent records are kept."
+        );
+      }
+      if (viewMode === "compare") {
+        updateCompareModeCopy();
+      } else if (viewMode === "average") {
+        algorithmTitle.textContent = english ? "Average Performance" : "평균 성능 비교";
+        algorithmDesc.textContent = english
+          ? "Runs multiple random maps and compares average results."
+          : "랜덤 맵을 여러 번 실행해 알고리즘별 평균값을 비교합니다.";
+      } else if (!running) {
+        algorithmDesc.textContent = english ? algorithms[algorithm].descEn : algorithms[algorithm].desc;
+      }
+      compareSelectionCount.textContent = tr(
+        `${selectedCompareAlgorithms.size}개 선택`,
+        `${selectedCompareAlgorithms.size} selected`
+      );
+      filterSettings();
+      initTabs(true);
+    }
+
+    function filterSettings() {
+      const query = settingsSearch.value.trim().toLocaleLowerCase();
+      let visibleCount = 0;
+      for (const section of settingsSections) {
+        const categoryMatches =
+          activeSettingsCategory === "all" ||
+          section.dataset.settingsGroup === activeSettingsCategory;
+        const searchMatches =
+          !query ||
+          section.textContent.toLocaleLowerCase().includes(query);
+        const visible = categoryMatches && searchMatches;
+        section.classList.toggle("settings-filtered", !visible);
+        if (visible) visibleCount++;
+      }
+      settingsEmpty.classList.toggle("active", visibleCount === 0);
+    }
+
+    function setSettingsCategory(category) {
+      activeSettingsCategory = category;
+      for (const button of settingsCategories.querySelectorAll("[data-settings-category]")) {
+        button.classList.toggle("active", button.dataset.settingsCategory === category);
+      }
+      filterSettings();
+    }
+
+    function persistPreferences() {
+      localStorage.setItem(preferencesStorageKey, JSON.stringify(preferences));
+    }
+
+    function applyZoom() {
+      const zoom = Math.min(200, Math.max(50, Number(preferences.zoom) || 100));
+      const zoomRatio = zoom / 100;
+      preferences.zoom = zoom;
+      zoomCanvas.style.width = `${gridWrap.clientWidth}px`;
+      zoomCanvas.style.minHeight = `${gridWrap.clientHeight}px`;
+      zoomCanvas.style.zoom = String(zoomRatio);
+      if (zoom <= 100) {
+        gridWrap.scrollLeft = 0;
+        gridWrap.scrollTop = 0;
+      }
+      zoomResetBtn.textContent = `${zoom}%`;
+      zoomOutBtn.disabled = zoom <= 50;
+      zoomInBtn.disabled = zoom >= 200;
+    }
+
+    function changeZoom(amount) {
+      preferences.zoom = Math.min(200, Math.max(50, preferences.zoom + amount));
+      applyZoom();
+      persistPreferences();
+    }
+
+    function applyPreferences() {
+      document.body.dataset.theme = preferences.theme;
+      document.body.classList.toggle("reduce-effects", !preferences.effects);
+      stageTelemetry.classList.toggle("hidden", !preferences.telemetry);
+      animationDelay = Number(preferences.speed);
+      themeSelect.value = preferences.theme;
+      languageSelect.value = preferences.language;
+      speedSelect.value = String(preferences.speed);
+      effectsToggle.checked = preferences.effects;
+      telemetryToggle.checked = preferences.telemetry;
+      autoHistoryToggle.checked = preferences.autoHistory;
+      applyLanguage();
+      applyZoom();
+      if (grid.children.length) paint();
+    }
+
+    function loadPreferences() {
+      try {
+        preferences = {
+          ...defaultPreferences,
+          ...JSON.parse(localStorage.getItem(preferencesStorageKey) || "{}")
+        };
+      } catch {
+        preferences = { ...defaultPreferences };
+      }
+      applyPreferences();
+    }
+
+    function key(cell) {
+      return `${cell.r},${cell.c}`;
+    }
+
+    function defaultStart() {
+      return { r: Math.floor(rows / 2), c: Math.max(1, Math.floor(cols * 0.14)) };
+    }
+
+    function defaultGoal() {
+      return { r: Math.floor(rows / 2), c: Math.min(cols - 2, Math.floor(cols * 0.86)) };
+    }
+
+    function updateGridVars() {
+      document.documentElement.style.setProperty("--grid-cols", cols);
+      document.documentElement.style.setProperty("--grid-rows", rows);
+      document.body.classList.toggle("large-grid", rows * cols >= performanceProfile.largeGridCells);
+      colsLabel.textContent = cols;
+      rowsLabel.textContent = rows;
+      if (wallTargetMode === "count") {
+        wallRange.min = 0;
+        wallRange.max = Math.max(0, rows * cols - 2);
+        wallRange.step = 1;
+        if (wallTarget > Number(wallRange.max)) wallTarget = Number(wallRange.max);
+        wallRange.value = wallTarget;
+        wallTargetLabel.textContent = wallTarget;
+      } else {
+        wallRange.min = 0;
+        wallRange.max = 100;
+        wallRange.step = 1;
+        wallRange.value = wallRatio;
+        wallTargetLabel.textContent = `${wallRatio}%`;
+      }
+      stepLimitRange.max = rows * cols;
+      if (stepLimit > Number(stepLimitRange.max)) {
+        stepLimit = Number(stepLimitRange.max);
+        stepLimitRange.value = stepLimit;
+        stepLimitLabel.textContent = stepLimit;
+      }
+    }
+
+    function effectiveWallTarget() {
+      const maxWalls = Math.max(0, rows * cols - 2);
+      if (!useWallTargetSettings) return Math.min(defaultWallTarget, maxWalls);
+      if (wallTargetMode === "ratio") {
+        return Math.min(Math.round(maxWalls * wallRatio / 100), maxWalls);
+      }
+      return Math.min(wallTarget, maxWalls);
+    }
+
+    function fromKey(value) {
+      const [r, c] = value.split(",").map(Number);
+      return { r, c };
+    }
+
+    function same(a, b) {
+      return a.r === b.r && a.c === b.c;
+    }
+
+    function neighbors(cell) {
+      const orthogonal = [
+        { r: cell.r - 1, c: cell.c },
+        { r: cell.r, c: cell.c + 1 },
+        { r: cell.r + 1, c: cell.c },
+        { r: cell.r, c: cell.c - 1 }
+      ];
+      const diagonal = diagonalMovement
+        ? [
+          { r: cell.r - 1, c: cell.c - 1 },
+          { r: cell.r - 1, c: cell.c + 1 },
+          { r: cell.r + 1, c: cell.c + 1 },
+          { r: cell.r + 1, c: cell.c - 1 }
+        ]
+        : [];
+      return [...orthogonal, ...diagonal].filter(next => {
+        const inBounds =
+        next.r >= 0 &&
+        next.r < rows &&
+        next.c >= 0 &&
+        next.c < cols &&
+        !walls.has(key(next));
+        if (!inBounds) return false;
+        const isDiagonal = next.r !== cell.r && next.c !== cell.c;
+        if (!isDiagonal) return true;
+        const horizontalNeighbor = { r: cell.r, c: next.c };
+        const verticalNeighbor = { r: next.r, c: cell.c };
+        return !walls.has(key(horizontalNeighbor)) && !walls.has(key(verticalNeighbor));
+      });
+    }
+
+    function heuristic(cell) {
+      const rowDistance = Math.abs(cell.r - currentGoal.r);
+      const colDistance = Math.abs(cell.c - currentGoal.c);
+      return diagonalMovement
+        ? Math.max(rowDistance, colDistance)
+        : rowDistance + colDistance;
+    }
+
+    function cost(cell) {
+      if (same(cell, currentStart) || same(cell, currentGoal)) return 1;
+      return weightsEnabled ? (weights.get(key(cell)) ?? 1) : 1;
+    }
+
+    function formatTime(ms) {
+      const safeMs = Math.max(0, Number(ms) || 0);
+      const msText = safeMs < 10 ? safeMs.toFixed(2) : Math.round(safeMs).toString();
+      return `${msText}ms (${(safeMs / 1000).toFixed(3)}${tr("초", "s")})`;
+    }
+
+    function pathEnergy(path) {
+      return path.reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
+    }
+
+    function maxAllowedSteps() {
+      const stepSteps = useStepLimit ? stepLimit : Infinity;
+      return stepSteps;
+    }
+
+    function evaluateResult(result) {
+      const energy = pathEnergy(result.path);
+      const duration = result.computeMs;
+      if (!result.path.length) return { success: false, reason: "NO PATH", energy, duration };
+      if (useStepLimit && result.steps.length > stepLimit) return { success: false, reason: "STEP FAIL", energy, duration };
+      if (useTimeLimit && result.computeMs > timeLimitMs) return { success: false, reason: "TIME FAIL", energy, duration };
+      if (useEnergyLimit && energy > energyLimit) return { success: false, reason: "ENERGY FAIL", energy, duration };
+      return { success: true, reason: "PATH FOUND", energy, duration };
+    }
+
+    function reasonText(reason) {
+      const labels = {
+        "PATH FOUND": tr("성공", "Success"),
+        "NO PATH": tr("경로 없음", "No path"),
+        "STEP FAIL": tr("스텝 초과", "Step limit exceeded"),
+        "TIME FAIL": tr("시간 초과", "Time limit exceeded"),
+        "ENERGY FAIL": tr("에너지 초과", "Energy limit exceeded")
+      };
+      return labels[reason] ?? reason ?? tr("결과 없음", "No result");
+    }
+
+    function reasonDetail(reason, data = {}) {
+      if (reason === "STEP FAIL") return tr(
+        `스텝 제한 ${stepLimit} 안에 도착하지 못했습니다.`,
+        `The goal was not reached within the ${stepLimit}-step limit.`
+      );
+      if (reason === "TIME FAIL") return tr(
+        `시간 제한 ${formatTime(timeLimitMs)} 안에 도착하지 못했습니다.`,
+        `The goal was not reached within the ${formatTime(timeLimitMs)} time limit.`
+      );
+      if (reason === "ENERGY FAIL") return tr(
+        `필요 에너지 ${data.energy ?? "-"}가 제한 ${energyLimit}을 넘었습니다.`,
+        `Required energy ${data.energy ?? "-"} exceeded the limit of ${energyLimit}.`
+      );
+      if (reason === "NO PATH") return tr(
+        "벽에 막혀 시작점에서 목표점까지 연결된 경로가 없습니다.",
+        "No connected route exists between the start and goal."
+      );
+      return tr(
+        `경로 탐색에 성공했습니다. 에너지 ${data.energy ?? "-"}`,
+        `Path found successfully. Energy: ${data.energy ?? "-"}`
+      );
+    }
+
+    function rankItems(items, score) {
+      return [...items]
+        .sort((a, b) => {
+          const left = score(a);
+          const right = score(b);
+          for (let i = 0; i < left.length; i++) {
+            if (left[i] !== right[i]) return left[i] - right[i];
+          }
+          return 0;
+        })
+        .reduce((ranks, item, index) => {
+          ranks[item.id] = index + 1;
+          return ranks;
+        }, {});
+    }
+
+    function getCompareRanks() {
+      const completed = Object.entries(compareRuns)
+        .filter(([, run]) => run.done)
+        .map(([id, run]) => ({
+          id,
+          success: run.success,
+          time: run.timeMs ?? Infinity,
+          cost: [...run.path].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0),
+          visited: run.visited.size
+        }));
+      return rankItems(completed, item => [
+        item.success ? 0 : 1,
+        item.time,
+        item.cost,
+        item.visited
+      ]);
+    }
+
+    function compareResultRows() {
+      const ranks = getCompareRanks();
+      return Object.entries(compareRuns).map(([id, run]) => ({
+        id,
+        title: algorithms[id].title,
+        rank: ranks[id],
+        success: Boolean(run.success),
+        reason: run.reason,
+        visited: run.visited.size,
+        path: run.path.size,
+        cost: [...run.path].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0),
+        energy: run.energy ?? 0,
+        timeMs: run.timeMs ?? 0
+      }));
+    }
+
+    function recordSingleResult(verdict, result) {
+      setLatestSnapshot(snapshotBase({
+        reason: verdict.reason,
+        success: verdict.success,
+        visited: visitedCells.size,
+        path: verdict.success ? result.path.length : 0,
+        cost: verdict.success ? pathEnergy(result.path) : 0,
+        energy: verdict.energy,
+        timeMs: verdict.duration
+      }), true);
+    }
+
+    function randomInt(min, max, step = 1) {
+      const slots = Math.floor((max - min) / step) + 1;
+      return min + Math.floor(Math.random() * slots) * step;
+    }
+
+    function updateLimitLabels() {
+      timeLimitLabel.textContent = formatTime(timeLimitMs);
+      energyLimitLabel.textContent = energyLimit;
+      stepLimitLabel.textContent = stepLimit;
+    }
+
+    function randomizeActiveLimits() {
+      if (useTimeLimit && timeLimitMode === "random") {
+        timeLimitMs = randomInt(2500, 5000, 100);
+        timeLimitRange.value = timeLimitMs;
+      }
+      if (useEnergyLimit && energyLimitMode === "random") {
+        energyLimit = randomInt(60, 120);
+        energyLimitRange.value = energyLimit;
+      }
+      if (useStepLimit && stepLimitMode === "random") {
+        stepLimit = randomInt(80, 180);
+        stepLimitRange.value = stepLimit;
+      }
+      updateLimitLabels();
+    }
+
+    function limitText(enabled, valueText) {
+      return enabled ? valueText : tr("없음", "None");
+    }
+
+    function clampRangeValue(range, value) {
+      const min = Number(range.min || 0);
+      const max = Number(range.max || value);
+      const step = range.step && range.step !== "any" ? Number(range.step) : 1;
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return Number(range.value);
+      const clamped = Math.min(max, Math.max(min, numeric));
+      const snapped = min + Math.round((clamped - min) / step) * step;
+      return Math.min(max, Math.max(min, Number(snapped.toFixed(5))));
+    }
+
+    function makeSliderLabelEditable(label, range) {
+      label.tabIndex = 0;
+      label.title = tr("클릭해서 숫자 입력", "Click to enter a number");
+
+      const openEditor = () => {
+        if (range.disabled) return;
+        if (label.querySelector("input")) return;
+        const previous = range.value;
+        const input = document.createElement("input");
+        input.type = "number";
+        input.className = "label-editor";
+        input.min = range.min;
+        input.max = range.max;
+        input.step = range.step || "1";
+        input.value = range.value;
+        label.textContent = "";
+        label.appendChild(input);
+        input.focus();
+        input.select();
+
+        let closed = false;
+        const close = (apply) => {
+          if (closed) return;
+          closed = true;
+          if (apply) {
+            range.value = clampRangeValue(range, input.value);
+            range.dispatchEvent(new Event("input", { bubbles: true }));
+            range.dispatchEvent(new Event("change", { bubbles: true }));
+          } else {
+            range.value = previous;
+            range.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+        };
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") close(true);
+          if (event.key === "Escape") close(false);
+        });
+        input.addEventListener("blur", () => close(true));
+      };
+
+      label.addEventListener("click", openEditor);
+      label.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openEditor();
+        }
+      });
+    }
+
+    function initEditableSliderLabels() {
+      [
+        [colsLabel, colsRange],
+        [rowsLabel, rowsRange],
+        [wallTargetLabel, wallRange],
+        [repeatLabel, repeatRange],
+        [timeLimitLabel, timeLimitRange],
+        [energyLimitLabel, energyLimitRange],
+        [stepLimitLabel, stepLimitRange]
+      ].forEach(([label, range]) => makeSliderLabelEditable(label, range));
+    }
+
+    function updateRunSummary() {
+      const gridModeText = useGridSizeSettings
+        ? (gridSizeMode === "random" ? tr("랜덤", "Random") : tr("사용자", "Custom"))
+        : tr("기본값", "Default");
+      const wallModeText = useWallTargetSettings
+        ? wallTargetMode === "ratio"
+          ? `${wallRatio}% / ${tr("비율", "Ratio")}`
+          : tr("개수", "Count")
+        : tr("기본값", "Default");
+      const activeLimitCount = [useTimeLimit, useEnergyLimit, useStepLimit].filter(Boolean).length;
+      runSummary.innerHTML = `
+        <div><strong>${tr("칸", "Grid")}</strong> ${cols}×${rows} / ${gridModeText}</div>
+        <div><strong>${tr("맵", "Map")}</strong> ${tr("벽", "walls")} ${walls.size}/${effectiveWallTarget()} / ${wallModeText}, ${tr("시작/끝", "start/end")} ${pointsMode === "random" ? tr("랜덤", "Random") : tr("고정", "Fixed")}</div>
+        <div><strong>${tr("가중치", "Weights")}</strong> ${weightsEnabled ? tr("사용", "On") : tr("미사용", "Off")}</div>
+        <div><strong>${tr("이동", "Movement")}</strong> ${diagonalMovement ? tr("8방향", "8 directions") : tr("4방향", "4 directions")}</div>
+        <div><strong>${tr("시간", "Time")}</strong> ${limitText(useTimeLimit, `${formatTime(timeLimitMs)} / ${timeLimitMode === "random" ? tr("랜덤", "Random") : tr("사용자", "Custom")}`)}</div>
+        <div><strong>${tr("에너지", "Energy")}</strong> ${limitText(useEnergyLimit, `${energyLimit} / ${energyLimitMode === "random" ? tr("랜덤", "Random") : tr("사용자", "Custom")}`)}</div>
+        <div><strong>${tr("스텝", "Steps")}</strong> ${limitText(useStepLimit, `${stepLimit} / ${stepLimitMode === "random" ? tr("랜덤", "Random") : tr("사용자", "Custom")}`)}</div>
+      `;
+      quickSummary.innerHTML = `
+        <div><strong>${cols}×${rows}</strong>${tr("칸", "grid")}</div>
+        <div><strong>${walls.size}/${effectiveWallTarget()}</strong>${tr("벽", "walls")}</div>
+        <div><strong>${weightsEnabled ? "ON" : "OFF"}</strong>${tr("가중치", "weight")}</div>
+        <div><strong>${activeLimitCount}</strong>${tr("제한", "limits")}</div>
+      `;
+    }
+
+    function randomWeight() {
+      const roll = Math.random();
+      if (roll < 0.52) return 1 + Math.floor(Math.random() * 3);
+      if (roll < 0.84) return 4 + Math.floor(Math.random() * 3);
+      return 7 + Math.floor(Math.random() * 3);
+    }
+
+    function randomizeWeights() {
+      weights.clear();
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = { r, c };
+          weights.set(key(cell), same(cell, currentStart) || same(cell, currentGoal) ? 1 : randomWeight());
+        }
+      }
+    }
+
+    function randomOpenCell(exclude = new Set()) {
+      const candidates = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = { r, c };
+          const cellKey = key(cell);
+          if (!walls.has(cellKey) && !exclude.has(cellKey)) candidates.push(cell);
+        }
+      }
+      return candidates[Math.floor(Math.random() * candidates.length)] ?? defaultStart();
+    }
+
+    function randomizePoints() {
+      const first = randomOpenCell();
+      const second = randomOpenCell(new Set([key(first)]));
+      currentStart = first;
+      currentGoal = second;
+      weights.set(key(currentStart), 1);
+      weights.set(key(currentGoal), 1);
+    }
+
+    function reconstruct(cameFrom) {
+      const path = [];
+      let cursor = key(currentGoal);
+      while (cameFrom.has(cursor)) {
+        path.push(cursor);
+        cursor = cameFrom.get(cursor);
+      }
+      path.reverse();
+      return path;
+    }
+
+    function makeBfs() {
+      const queue = [currentStart];
+      let queueIndex = 0;
+      const seen = new Set([key(currentStart)]);
+      const cameFrom = new Map();
+      const steps = [];
+
+      while (queueIndex < queue.length) {
+        const current = queue[queueIndex++];
+        const currentKey = key(current);
+        if (same(current, currentGoal)) {
+          steps.push({ current: currentKey, added: [], code: "goal reached" });
+          return { steps, path: reconstruct(cameFrom) };
+        }
+
+        const added = [];
+        for (const next of neighbors(current)) {
+          const nextKey = key(next);
+          if (seen.has(nextKey)) continue;
+          seen.add(nextKey);
+          cameFrom.set(nextKey, currentKey);
+          queue.push(next);
+          added.push(nextKey);
+        }
+        steps.push({ current: currentKey, added, code: "queue.shift()" });
+      }
+      return { steps, path: [] };
+    }
+
+    function heapPush(heap, item) {
+      heap.push(item);
+      let index = heap.length - 1;
+      while (index > 0) {
+        const parent = Math.floor((index - 1) / 2);
+        if (heap[parent].priority <= item.priority) break;
+        heap[index] = heap[parent];
+        index = parent;
+      }
+      heap[index] = item;
+    }
+
+    function heapPop(heap) {
+      const root = heap[0];
+      const last = heap.pop();
+      if (heap.length && last) {
+        let index = 0;
+        while (true) {
+          const left = index * 2 + 1;
+          const right = left + 1;
+          if (left >= heap.length) break;
+          const child = right < heap.length && heap[right].priority < heap[left].priority
+            ? right
+            : left;
+          if (heap[child].priority >= last.priority) break;
+          heap[index] = heap[child];
+          index = child;
+        }
+        heap[index] = last;
+      }
+      return root;
+    }
+
+    function makeDfs() {
+      const stack = [currentStart];
+      const seen = new Set([key(currentStart)]);
+      const cameFrom = new Map();
+      const steps = [];
+
+      while (stack.length) {
+        const current = stack.pop();
+        const currentKey = key(current);
+        if (same(current, currentGoal)) {
+          steps.push({ current: currentKey, added: [], code: "goal reached" });
+          return { steps, path: reconstruct(cameFrom) };
+        }
+
+        const added = [];
+        for (const next of neighbors(current).reverse()) {
+          const nextKey = key(next);
+          if (seen.has(nextKey)) continue;
+          seen.add(nextKey);
+          cameFrom.set(nextKey, currentKey);
+          stack.push(next);
+          added.push(nextKey);
+        }
+        steps.push({ current: currentKey, added, code: "stack.pop()" });
+      }
+      return { steps, path: [] };
+    }
+
+    function makeWeighted(useHeuristic) {
+      const startKey = key(currentStart);
+      const open = [];
+      heapPush(open, {
+        cell: currentStart,
+        distance: 0,
+        priority: useHeuristic ? heuristic(currentStart) : 0
+      });
+      const dist = new Map([[startKey, 0]]);
+      const cameFrom = new Map();
+      const closed = new Set();
+      const steps = [];
+
+      while (open.length) {
+        const entry = heapPop(open);
+        const current = entry.cell;
+        const currentKey = key(current);
+        if (entry.distance !== dist.get(currentKey)) continue;
+        if (closed.has(currentKey)) continue;
+        closed.add(currentKey);
+
+        if (same(current, currentGoal)) {
+          steps.push({ current: currentKey, added: [], code: "goal reached" });
+          return { steps, path: reconstruct(cameFrom) };
+        }
+
+        const added = [];
+        for (const next of neighbors(current)) {
+          const nextKey = key(next);
+          const candidate = dist.get(currentKey) + cost(next);
+          if (candidate < (dist.get(nextKey) ?? Infinity)) {
+            dist.set(nextKey, candidate);
+            cameFrom.set(nextKey, currentKey);
+            heapPush(open, {
+              cell: next,
+              distance: candidate,
+              priority: candidate + (useHeuristic ? heuristic(next) : 0)
+            });
+            added.push(nextKey);
+          }
+        }
+        steps.push({
+          current: currentKey,
+          added,
+          code: useHeuristic ? "lowest g + h selected" : "lowest distance selected"
+        });
+      }
+      return { steps, path: [] };
+    }
+
+    const searchEngine = Object.freeze({
+      bfs: makeBfs,
+      dfs: makeDfs,
+      dijkstra: () => makeWeighted(false),
+      astar: () => makeWeighted(true)
+    });
+
+    function compute(selected = algorithm) {
+      const startedAt = performance.now();
+      const runner = searchEngine[selected] ?? searchEngine.astar;
+      const result = runner();
+      result.computeMs = performance.now() - startedAt;
+      return result;
+    }
+
+    function buildGrid() {
+      grid.innerHTML = "";
+      const fragment = document.createDocumentFragment();
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = document.createElement("button");
+          cell.className = "cell";
+          cell.type = "button";
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.setAttribute("aria-label", `row ${r + 1}, col ${c + 1}`);
+          cell.addEventListener("click", () => editCell({ r, c }));
+          fragment.appendChild(cell);
+        }
+      }
+      grid.appendChild(fragment);
+      paint();
+    }
+
+    function buildCompareGrids() {
+      compareWrap.innerHTML = "";
+      const compareFragment = document.createDocumentFragment();
+      const selectedIds = [...selectedCompareAlgorithms];
+      compareWrap.dataset.count = selectedIds.length;
+      for (const id of selectedIds) {
+        const item = algorithms[id];
+        const card = document.createElement("div");
+        card.className = "compare-card";
+        card.dataset.algorithm = id;
+        card.innerHTML = `
+          <div class="compare-head">
+            <span>${item.title}</span>
+            <span data-stat>준비</span>
+          </div>
+          <div class="mini-grid" aria-label="${item.title} grid"></div>
+        `;
+        const mini = card.querySelector(".mini-grid");
+        const miniFragment = document.createDocumentFragment();
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.dataset.r = r;
+            cell.dataset.c = c;
+            miniFragment.appendChild(cell);
+          }
+        }
+        mini.appendChild(miniFragment);
+        compareFragment.appendChild(card);
+      }
+      compareWrap.appendChild(compareFragment);
+      renderCompare();
+    }
+
+    function updateCompareSelection(changedInput) {
+      const checked = compareAlgorithmInputs.filter(input => input.checked);
+      if (checked.length < 2) {
+        changedInput.checked = true;
+        hint.textContent = tr(
+          "비교하려면 알고리즘을 최소 2개 선택해야 합니다.",
+          "Select at least two algorithms to compare."
+        );
+        return;
+      }
+      selectedCompareAlgorithms = new Set(checked.map(input => input.dataset.compareAlgorithm));
+      const count = selectedCompareAlgorithms.size;
+      compareSelectionCount.textContent = tr(`${count}개 선택`, `${count} selected`);
+      buildCompareGrids();
+      if (viewMode === "compare") {
+        stopTimer();
+        updateCompareModeCopy();
+        clearRunState();
+      }
+    }
+
+    function updateCompareModeCopy() {
+      const count = selectedCompareAlgorithms.size;
+      const names = [...selectedCompareAlgorithms].map(id => algorithms[id].title).join(", ");
+      algorithmTitle.textContent = tr(`${count}개 알고리즘 비교`, `${count}-Algorithm Comparison`);
+      algorithmDesc.textContent = tr(
+        `같은 맵에서 선택한 ${count}개 알고리즘을 동시에 실행해 비교합니다.`,
+        `Runs the selected ${count} algorithms on the same map for comparison.`
+      );
+      codeLine.textContent = `same map -> ${names}`;
+      hint.textContent = tr(
+        `실행을 누르면 ${names} 알고리즘이 동시에 움직입니다.`,
+        `Run to animate ${names} together.`
+      );
+    }
+
+    function buildAveragePreview() {
+      averagePreview.innerHTML = "";
+      const previewFragment = document.createDocumentFragment();
+      for (const [id, item] of Object.entries(algorithms)) {
+        const card = document.createElement("div");
+        card.className = "average-preview-card";
+        card.dataset.algorithm = id;
+        card.innerHTML = `
+          <div class="average-preview-head">
+            <span>${item.title}</span>
+            <span data-average-stat>${tr("준비", "Ready")}</span>
+          </div>
+          <div class="average-preview-grid" aria-label="${item.title} average preview"></div>
+        `;
+        const previewGrid = card.querySelector(".average-preview-grid");
+        const gridFragment = document.createDocumentFragment();
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.dataset.r = r;
+            cell.dataset.c = c;
+            gridFragment.appendChild(cell);
+          }
+        }
+        previewGrid.appendChild(gridFragment);
+        for (const cell of previewGrid.children) {
+          paintCell(cell, { visited: new Set(), frontier: new Set(), path: new Set() });
+          cell.textContent = "";
+        }
+        previewFragment.appendChild(card);
+      }
+      averagePreview.appendChild(previewFragment);
+    }
+
+    function renderAveragePreview(previewRuns, runNumber) {
+      if (averagePreview.children.length !== Object.keys(algorithms).length) buildAveragePreview();
+      for (const card of averagePreview.children) {
+        const preview = previewRuns[card.dataset.algorithm];
+        if (!preview) continue;
+        const { result, verdict } = preview;
+        const visited = new Set();
+        const frontier = new Set();
+        for (const step of result.steps) {
+          frontier.delete(step.current);
+          visited.add(step.current);
+          for (const cellKey of step.added) {
+            if (!visited.has(cellKey)) frontier.add(cellKey);
+          }
+        }
+        const path = new Set(verdict.success ? result.path : []);
+        for (const cell of card.querySelector(".average-preview-grid").children) {
+          paintCell(cell, { visited, frontier, path });
+          cell.textContent = "";
+        }
+        card.querySelector("[data-average-stat]").textContent = verdict.success
+          ? tr("성공", "Success")
+          : reasonText(verdict.reason);
+      }
+      const progress = Math.round((runNumber / repeatCount) * 100);
+      averageProgressFill.style.width = `${progress}%`;
+      averageProgressTitle.textContent = `${tr("4개 알고리즘", "4 algorithms")} · ${runNumber}/${repeatCount}`;
+      averageProgressText.textContent = tr(
+        `${progress}% 계산 중`,
+        `${progress}% complete`
+      );
+    }
+
+    function paintCell(el, state) {
+      const cell = { r: Number(el.dataset.r), c: Number(el.dataset.c) };
+      const cellKey = key(cell);
+      const cellWeight = cost(cell);
+      el.className = "cell";
+      el.textContent =
+        walls.has(cellKey) ||
+        !weightsEnabled ||
+        same(cell, currentStart) ||
+        same(cell, currentGoal)
+          ? ""
+          : cellWeight;
+      if (preferences.theme === "light") {
+        el.style.setProperty(
+          "--cell-bg",
+          `rgb(${238 - cellWeight * 8}, ${246 - cellWeight * 7}, ${249 - cellWeight * 5})`
+        );
+      } else {
+        el.style.setProperty("--cell-bg", `rgba(${22 + cellWeight * 10}, ${34 + cellWeight * 5}, ${45 + cellWeight * 2}, 0.88)`);
+      }
+      if (walls.has(cellKey)) el.classList.add("wall");
+      if (state.visited.has(cellKey)) el.classList.add("visited");
+      if (state.frontier.has(cellKey)) el.classList.add("frontier");
+      if (state.path.has(cellKey)) el.classList.add("path");
+      if (same(cell, currentStart)) el.classList.add("start");
+      if (same(cell, currentGoal)) el.classList.add("goal");
+    }
+
+    function gridCellByKey(container, cellKey) {
+      const cell = fromKey(cellKey);
+      return container.children[cell.r * cols + cell.c];
+    }
+
+    function repaintKeys(container, keys, state) {
+      for (const cellKey of keys) {
+        const el = gridCellByKey(container, cellKey);
+        if (el) paintCell(el, state);
+      }
+    }
+
+    function animationBatchSize() {
+      const cellCount = rows * cols;
+      for (const threshold of performanceProfile.batchThresholds) {
+        if (cellCount >= threshold.cells) return threshold.size;
+      }
+      return 1;
+    }
+
+    function visualTickDelay() {
+      return Math.round(animationDelay * performanceProfile.visualSlowdown);
+    }
+
+    function updateSingleMetrics() {
+      visitedCount.textContent = visitedCells.size;
+      pathCount.textContent = pathCells.size;
+      pathCost.textContent = [...pathCells].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
+      wallCount.textContent = walls.size;
+    }
+
+    function paint() {
+      const state = { visited: visitedCells, frontier: frontierCells, path: pathCells };
+      for (const el of grid.children) {
+        paintCell(el, state);
+      }
+      updateSingleMetrics();
+      updateRunSummary();
+      if (viewMode === "compare") renderCompare();
+    }
+
+    function renderCompare(changedByAlgorithm = null) {
+      if (!compareWrap.children.length) return;
+      const ranks = getCompareRanks();
+      for (const card of compareWrap.children) {
+        const id = card.dataset.algorithm;
+        const run = compareRuns[id] ?? { visited: new Set(), frontier: new Set(), path: new Set(), done: false };
+        const state = { visited: run.visited, frontier: run.frontier, path: run.path };
+        const miniGrid = card.querySelector(".mini-grid");
+        const changedKeys = changedByAlgorithm?.get(id);
+        if (changedKeys) {
+          repaintKeys(miniGrid, changedKeys, state);
+        } else {
+          for (const el of miniGrid.children) paintCell(el, state);
+        }
+        const stat = card.querySelector("[data-stat]");
+        const costTotal = [...run.path].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
+        stat.textContent = run.done
+          ? `#${ranks[id]} ${reasonText(run.reason)} / ${tr("탐색", "explored")} ${run.visited.size || 0} / ${tr("경로", "path")} ${run.path.size || 0} / ${tr("비용", "cost")} ${costTotal} / ${formatTime(run.timeMs)}`
+          : `${tr("탐색", "Explored")} ${run.visited.size || 0} ${tr("칸", "cells")}`;
+        stat.title = run.done ? reasonDetail(run.reason, { energy: run.energy }) : tr("탐색 중", "Exploring");
+      }
+    }
+
+    function updateCompareMetrics(includeSummary = true) {
+      const runs = Object.values(compareRuns);
+      visitedCount.textContent = runs.reduce((sum, run) => sum + run.visited.size, 0);
+      pathCount.textContent = runs.reduce((sum, run) => sum + run.path.size, 0);
+      pathCost.textContent = runs.reduce((sum, run) => {
+        return sum + [...run.path].reduce((inner, cellKey) => inner + cost(fromKey(cellKey)), 0);
+      }, 0);
+      wallCount.textContent = walls.size;
+      if (includeSummary) updateRunSummary();
+      timeCount.textContent = runs.length
+        ? formatTime(Math.max(...runs.map(run => run.timeMs ?? elapsedMs ?? 0)))
+        : formatTime(0);
+    }
+
+    function renderAverageRows(rowsData = []) {
+      averageBody.innerHTML = "";
+      for (const row of rowsData) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="rank-badge">#${row.rank}</span></td>
+          <td>${row.title}</td>
+          <td>${row.successRate}</td>
+          <td>${row.avgVisited}</td>
+          <td>${row.avgPath}</td>
+          <td>${row.avgCost}</td>
+          <td>${row.avgTime}</td>
+          <td>${row.failureReason}</td>
+        `;
+        averageBody.appendChild(tr);
+      }
+    }
+
+    function snapshotBase(result) {
+      return {
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        savedAt: new Date().toISOString(),
+        mode: viewMode,
+        algorithm,
+        map: {
+          rows,
+          cols,
+          walls: [...walls],
+          weights: [...weights],
+          start: currentStart,
+          goal: currentGoal
+        },
+        settings: {
+          pointsMode,
+          gridSizeMode,
+          useGridSizeSettings,
+          useWallTargetSettings,
+          wallTarget,
+          wallTargetMode,
+          wallRatio,
+          weightsEnabled,
+          diagonalMovement,
+          useTimeLimit,
+          timeLimitMs,
+          timeLimitMode,
+          useEnergyLimit,
+          energyLimit,
+          energyLimitMode,
+          useStepLimit,
+          stepLimit,
+          stepLimitMode,
+          repeatCount,
+          compareAlgorithms: [...selectedCompareAlgorithms]
+        },
+        result
+      };
+    }
+
+    function resultSummaryText(snapshot) {
+      const modeName = snapshot.mode === "single"
+        ? algorithms[snapshot.algorithm]?.title ?? snapshot.algorithm
+        : snapshot.mode === "compare"
+          ? tr(`${snapshot.result.rows.length}개 비교`, `Compare ${snapshot.result.rows.length}`)
+          : tr("평균", "Average");
+      if (snapshot.mode === "single") {
+        return `${modeName} · ${reasonText(snapshot.result.reason)} · ${formatTime(snapshot.result.timeMs)}`;
+      }
+      if (snapshot.mode === "compare") {
+        const winner = snapshot.result.rows.find(row => row.rank === 1);
+        const comparedCount = snapshot.result.rows.length;
+        return tr(
+          `${modeName} · 1위 ${winner?.title ?? "-"} · ${snapshot.result.rows.filter(row => row.success).length}/${comparedCount} 성공`,
+          `${modeName} · #1 ${winner?.title ?? "-"} · ${snapshot.result.rows.filter(row => row.success).length}/${comparedCount} succeeded`
+        );
+      }
+      const winner = snapshot.result.rows.find(row => row.rank === 1);
+      return tr(
+        `${modeName} · ${snapshot.result.repeatCount}회 · 1위 ${winner?.title ?? "-"}`,
+        `${modeName} · ${snapshot.result.repeatCount} runs · #1 ${winner?.title ?? "-"}`
+      );
+    }
+
+    function setLatestSnapshot(snapshot, autoRecord = false) {
+      latestSnapshot = snapshot;
+      if (snapshot) historyDetail.textContent = `${tr("현재 결과", "Current result")}: ${resultSummaryText(snapshot)}`;
+      if (snapshot && autoRecord && preferences.autoHistory) autoRecordHistory(snapshot);
+    }
+
+    function persistHistory() {
+      try {
+        localStorage.setItem(historyStorageKey, JSON.stringify(executionHistory));
+      } catch {
+        historyDetail.textContent = tr("브라우저 저장 공간을 사용할 수 없습니다.", "Browser storage is unavailable.");
+      }
+    }
+
+    function trimAutomaticHistory() {
+      let automaticCount = 0;
+      executionHistory = executionHistory.filter(entry => {
+        if (entry.kept) return true;
+        automaticCount++;
+        return automaticCount <= 20;
+      });
+    }
+
+    function renderHistoryOptions(selectedId = "") {
+      historySelect.innerHTML = "";
+      keptHistorySelect.innerHTML = "";
+      const recentEntries = executionHistory.filter(entry => !entry.kept);
+      const keptEntries = executionHistory.filter(entry => entry.kept);
+
+      if (!recentEntries.length) {
+        historySelect.innerHTML = `<option value="">${tr("최근 기록 없음", "No recent records")}</option>`;
+      } else {
+        historySelect.innerHTML = `<option value="">${tr("최근 기록 선택", "Select a recent record")}</option>`;
+        for (const entry of recentEntries) {
+          const option = document.createElement("option");
+          option.value = entry.id;
+          option.textContent = `${new Date(entry.savedAt).toLocaleString(preferences.language === "en" ? "en-US" : "ko-KR")} · ${resultSummaryText(entry)}`;
+          historySelect.appendChild(option);
+        }
+      }
+
+      if (!keptEntries.length) {
+        keptHistorySelect.innerHTML = `<option value="">${tr("보관된 기록 없음", "No kept records")}</option>`;
+      } else {
+        keptHistorySelect.innerHTML = `<option value="">${tr("보관 기록 선택", "Select a kept record")}</option>`;
+        for (const entry of keptEntries) {
+          const option = document.createElement("option");
+          option.value = entry.id;
+          option.textContent = `${new Date(entry.savedAt).toLocaleString(preferences.language === "en" ? "en-US" : "ko-KR")} · ${resultSummaryText(entry)}`;
+          keptHistorySelect.appendChild(option);
+        }
+      }
+
+      const selected = executionHistory.find(entry => entry.id === selectedId);
+      if (selected?.kept) keptHistorySelect.value = selected.id;
+      else if (selected) historySelect.value = selected.id;
+      const hasSelection = Boolean(selectedHistoryEntry());
+      loadHistoryBtn.disabled = !hasSelection;
+      deleteHistoryBtn.disabled = !hasSelection;
+      saveHistoryBtn.disabled = !hasSelection;
+      saveHistoryBtn.textContent = selected?.kept ? tr("보관 해제", "Unkeep") : tr("보관", "Keep");
+    }
+
+    function loadHistoryFromStorage() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(historyStorageKey) || "[]");
+        executionHistory = Array.isArray(stored)
+          ? stored.map(entry => ({ ...entry, kept: Boolean(entry.kept) }))
+          : [];
+        trimAutomaticHistory();
+        persistHistory();
+      } catch {
+        executionHistory = [];
+      }
+      renderHistoryOptions();
+    }
+
+    function autoRecordHistory(snapshot) {
+      const saved = { ...snapshot, kept: false };
+      executionHistory.unshift(saved);
+      trimAutomaticHistory();
+      persistHistory();
+      renderHistoryOptions(saved.id);
+      historyDetail.textContent = `${tr("자동 저장됨", "Auto-saved")}: ${resultSummaryText(saved)}`;
+    }
+
+    function toggleSelectedHistoryKeep() {
+      const entry = selectedHistoryEntry();
+      if (!entry) return;
+      entry.kept = !entry.kept;
+      trimAutomaticHistory();
+      persistHistory();
+      renderHistoryOptions(entry.id);
+      historyDetail.textContent = entry.kept
+        ? `${tr("보관됨", "Kept")}: ${resultSummaryText(entry)}`
+        : `${tr("보관 해제됨", "Removed from kept")}: ${resultSummaryText(entry)}`;
+    }
+
+    function selectedHistoryEntry() {
+      const selectedId = historySelect.value || keptHistorySelect.value;
+      return executionHistory.find(entry => entry.id === selectedId);
+    }
+
+    function displayLoadedResult(entry) {
+      if (entry.mode === "single") {
+        const result = entry.result;
+        visitedCount.textContent = result.visited;
+        pathCount.textContent = result.path;
+        pathCost.textContent = result.cost;
+        wallCount.textContent = walls.size;
+        timeCount.textContent = formatTime(result.timeMs);
+        stateBadge.textContent = reasonText(result.reason);
+        hint.textContent = reasonDetail(result.reason, { energy: result.energy });
+        return;
+      }
+
+      if (entry.mode === "compare") {
+        for (const row of entry.result.rows) {
+          const card = [...compareWrap.children].find(item => item.dataset.algorithm === row.id);
+          const stat = card?.querySelector("[data-stat]");
+          if (stat) {
+            stat.textContent = `#${row.rank} ${reasonText(row.reason)} / ${tr("탐색", "explored")} ${row.visited} / ${tr("경로", "path")} ${row.path} / ${tr("비용", "cost")} ${row.cost} / ${formatTime(row.timeMs)}`;
+            stat.title = reasonDetail(row.reason, { energy: row.energy });
+          }
+        }
+        visitedCount.textContent = entry.result.rows.reduce((sum, row) => sum + row.visited, 0);
+        pathCount.textContent = entry.result.rows.reduce((sum, row) => sum + row.path, 0);
+        pathCost.textContent = entry.result.rows.reduce((sum, row) => sum + row.cost, 0);
+        wallCount.textContent = walls.size;
+        timeCount.textContent = formatTime(Math.max(...entry.result.rows.map(row => row.timeMs)));
+        stateBadge.textContent = tr("기록 불러옴", "Record loaded");
+        hint.textContent = tr(
+          `저장된 비교 결과: 1위 ${entry.result.rows.find(row => row.rank === 1)?.title ?? "-"}`,
+          `Loaded comparison: #1 ${entry.result.rows.find(row => row.rank === 1)?.title ?? "-"}`
+        );
+        return;
+      }
+
+      renderAverageRows(entry.result.rows);
+      visitedCount.textContent = "-";
+      pathCount.textContent = "-";
+      pathCost.textContent = "-";
+      wallCount.textContent = walls.size;
+      timeCount.textContent = "-";
+      averageNote.textContent = tr(
+        `저장된 ${entry.result.repeatCount}회 평균 실행 결과입니다.`,
+        `Loaded average result from ${entry.result.repeatCount} runs.`
+      );
+      stateBadge.textContent = tr("기록 불러옴", "Record loaded");
+      hint.textContent = tr(
+        `저장된 평균 결과: 1위 ${entry.result.rows.find(row => row.rank === 1)?.title ?? "-"}`,
+        `Loaded average result: #1 ${entry.result.rows.find(row => row.rank === 1)?.title ?? "-"}`
+      );
+    }
+
+    function restoreHistoryEntry(entry) {
+      if (!entry) return;
+      stopTimer();
+      const savedMap = entry.map;
+      const saved = entry.settings;
+      rows = savedMap.rows;
+      cols = savedMap.cols;
+      currentStart = savedMap.start;
+      currentGoal = savedMap.goal;
+      walls = new Set(savedMap.walls);
+      weights = new Map(savedMap.weights);
+      pointsMode = saved.pointsMode;
+      gridSizeMode = saved.gridSizeMode;
+      useGridSizeSettings = saved.useGridSizeSettings;
+      useWallTargetSettings = saved.useWallTargetSettings;
+      wallTarget = saved.wallTarget;
+      wallTargetMode = saved.wallTargetMode ?? "count";
+      wallRatio = saved.wallRatio ?? 25;
+      weightsEnabled = saved.weightsEnabled;
+      diagonalMovement = Boolean(saved.diagonalMovement);
+      useTimeLimit = saved.useTimeLimit;
+      timeLimitMs = saved.timeLimitMs;
+      timeLimitMode = saved.timeLimitMode;
+      useEnergyLimit = saved.useEnergyLimit;
+      energyLimit = saved.energyLimit;
+      energyLimitMode = saved.energyLimitMode;
+      useStepLimit = saved.useStepLimit;
+      stepLimit = saved.stepLimit;
+      stepLimitMode = saved.stepLimitMode;
+      repeatCount = saved.repeatCount;
+      algorithm = entry.algorithm;
+      if (entry.mode === "compare") {
+        const savedCompareAlgorithms = saved.compareAlgorithms
+          ?? entry.result.rows.map(row => row.id);
+        if (savedCompareAlgorithms.length >= 2) {
+          selectedCompareAlgorithms = new Set(savedCompareAlgorithms);
+          for (const input of compareAlgorithmInputs) {
+            input.checked = selectedCompareAlgorithms.has(input.dataset.compareAlgorithm);
+          }
+          compareSelectionCount.textContent = tr(
+            `${selectedCompareAlgorithms.size}개 선택`,
+            `${selectedCompareAlgorithms.size} selected`
+          );
+        }
+      }
+
+      rowsRange.value = rows;
+      colsRange.value = cols;
+      wallRange.value = wallTargetMode === "ratio" ? wallRatio : wallTarget;
+      repeatRange.value = repeatCount;
+      timeLimitRange.value = timeLimitMs;
+      energyLimitRange.value = energyLimit;
+      stepLimitRange.value = stepLimit;
+      gridSizeToggle.checked = useGridSizeSettings;
+      wallTargetToggle.checked = useWallTargetSettings;
+      weightToggle.checked = weightsEnabled;
+      diagonalToggle.checked = diagonalMovement;
+      timeLimitToggle.checked = useTimeLimit;
+      energyLimitToggle.checked = useEnergyLimit;
+      stepLimitToggle.checked = useStepLimit;
+      weightsBtn.disabled = !weightsEnabled;
+      weightTool.disabled = !weightsEnabled;
+
+      updateGridVars();
+      updateLimitLabels();
+      updateRepeatCount(repeatCount);
+      syncMapSettingControls();
+      updateLimitToggles();
+      buildGrid();
+      buildCompareGrids();
+      setViewMode(entry.mode);
+      setAlgorithm(entry.algorithm);
+      setLatestSnapshot(entry);
+      displayLoadedResult(entry);
+      historyDetail.textContent = `${tr("불러옴", "Loaded")}: ${resultSummaryText(entry)}`;
+    }
+
+    function deleteSelectedHistory() {
+      const entry = selectedHistoryEntry();
+      if (!entry) return;
+      executionHistory = executionHistory.filter(item => item.id !== entry.id);
+      persistHistory();
+      renderHistoryOptions();
+      historyDetail.textContent = tr("선택한 실행 기록을 삭제했습니다.", "The selected run record was deleted.");
+    }
+
+    function clearRunState() {
+      setLatestSnapshot(null);
+      visitedCells = new Set();
+      frontierCells = new Set();
+      pathCells = new Set();
+      compareRuns = {};
+      elapsedMs = 0;
+      codeLine.textContent = viewMode === "compare"
+        ? `same map -> ${[...selectedCompareAlgorithms].map(id => algorithms[id].title).join(" / ")}`
+        : viewMode === "average"
+          ? "repeat random maps -> average metrics"
+          : algorithms[algorithm].code;
+      stateBadge.textContent = tr("준비", "Ready");
+      hint.textContent = viewMode === "compare"
+        ? tr(
+          `실행을 누르면 ${[...selectedCompareAlgorithms].map(id => algorithms[id].title).join(", ")} 알고리즘이 동시에 움직입니다.`,
+          `Run to animate ${[...selectedCompareAlgorithms].map(id => algorithms[id].title).join(", ")} together.`
+        )
+        : viewMode === "average"
+          ? tr("실행을 누르면 랜덤 맵 여러 개를 빠르게 계산해 평균값을 냅니다.", "Run to calculate averages across multiple random maps.")
+          : tr("칸을 클릭해 벽을 만들고 실행하세요.", "Click cells to add walls, then run the algorithm.");
+      paint();
+    }
+
+    function stopTimer() {
+      if (timer) clearInterval(timer);
+      averageRunToken++;
+      timer = null;
+      running = false;
+      paused = false;
+      document.getElementById("pauseBtn").textContent = tr("일시정지", "Pause");
+      document.getElementById("quickPauseBtn").textContent = "Ⅱ";
+    }
+
+    function run() {
+      stopTimer();
+      randomizeActiveLimits();
+      clearRunState();
+      if (viewMode === "compare") {
+        runCompare();
+        return;
+      }
+      if (viewMode === "average") {
+        runAverage();
+        return;
+      }
+      running = true;
+      runStartTime = performance.now();
+      stateBadge.textContent = tr("실행 중", "Running");
+      const result = compute();
+      const limitSteps = maxAllowedSteps();
+      const batchSize = animationBatchSize();
+      let index = 0;
+
+      timer = setInterval(() => {
+        if (paused) return;
+        const changedKeys = new Set(frontierCells);
+        let latestStep = null;
+        for (let batch = 0; batch < batchSize; batch++) {
+          if (index >= limitSteps) {
+            elapsedMs = result.computeMs;
+            const reason = "STEP FAIL";
+            stopTimer();
+            frontierCells.clear();
+            pathCells = new Set();
+            stateBadge.textContent = reasonText(reason);
+            hint.textContent = reasonDetail(reason);
+            paint();
+            timeCount.textContent = formatTime(elapsedMs);
+            recordSingleResult({ reason, success: false, energy: 0, duration: elapsedMs }, result);
+            return;
+          }
+          const step = result.steps[index];
+          if (!step) {
+            const verdict = evaluateResult(result);
+            elapsedMs = verdict.duration;
+            stopTimer();
+            frontierCells.clear();
+            pathCells = new Set(verdict.success ? result.path : []);
+            stateBadge.textContent = reasonText(verdict.reason);
+            hint.textContent = reasonDetail(verdict.reason, verdict);
+            paint();
+            timeCount.textContent = formatTime(elapsedMs);
+            recordSingleResult(verdict, result);
+            return;
+          }
+          latestStep = step;
+          frontierCells.delete(step.current);
+          visitedCells.add(step.current);
+          changedKeys.add(step.current);
+          for (const cellKey of step.added) {
+            if (!visitedCells.has(cellKey)) frontierCells.add(cellKey);
+            changedKeys.add(cellKey);
+          }
+          index++;
+        }
+
+        elapsedMs = Math.round(performance.now() - runStartTime);
+        codeLine.textContent = latestStep.code;
+        hint.textContent = tr(
+          `${algorithms[algorithm].title} 탐색 중: ${latestStep.current}`,
+          `${algorithms[algorithm].title} exploring: ${latestStep.current}`
+        );
+        repaintKeys(grid, changedKeys, {
+          visited: visitedCells,
+          frontier: frontierCells,
+          path: pathCells
+        });
+        updateSingleMetrics();
+        timeCount.textContent = formatTime(elapsedMs);
+      }, visualTickDelay());
+    }
+
+    function runCompare() {
+      running = true;
+      runStartTime = performance.now();
+      stateBadge.textContent = tr("비교 중", "Comparing");
+      compareRuns = {};
+      for (const id of selectedCompareAlgorithms) {
+        compareRuns[id] = {
+          result: compute(id),
+          visited: new Set(),
+          frontier: new Set(),
+          path: new Set(),
+          done: false
+        };
+      }
+
+      const batchSize = animationBatchSize();
+      let index = 0;
+      timer = setInterval(() => {
+        if (paused) return;
+        let allDone = true;
+        const changedByAlgorithm = new Map();
+        for (let batch = 0; batch < batchSize; batch++) {
+          allDone = true;
+          for (const [id, run] of Object.entries(compareRuns)) {
+            if (run.done) continue;
+            const changedKeys = changedByAlgorithm.get(id) ?? new Set();
+            for (const cellKey of run.frontier) changedKeys.add(cellKey);
+            changedByAlgorithm.set(id, changedKeys);
+            if (index >= maxAllowedSteps()) {
+              run.frontier.clear();
+              run.path = new Set();
+              run.done = true;
+              run.success = false;
+              run.reason = "STEP FAIL";
+              run.timeMs = run.result.computeMs;
+              run.energy = 0;
+              continue;
+            }
+            const step = run.result.steps[index];
+            if (!step) {
+              const verdict = evaluateResult(run.result);
+              run.frontier.clear();
+              run.path = new Set(verdict.success ? run.result.path : []);
+              for (const cellKey of run.path) changedKeys.add(cellKey);
+              run.done = true;
+              run.success = verdict.success;
+              run.reason = verdict.reason;
+              run.timeMs = verdict.duration;
+              run.energy = verdict.energy;
+              continue;
+            }
+            run.frontier.delete(step.current);
+            run.visited.add(step.current);
+            changedKeys.add(step.current);
+            for (const cellKey of step.added) {
+              if (!run.visited.has(cellKey)) run.frontier.add(cellKey);
+              changedKeys.add(cellKey);
+            }
+            allDone = false;
+          }
+          index++;
+          if (allDone) break;
+        }
+
+        renderCompare(changedByAlgorithm);
+        elapsedMs = Math.round(performance.now() - runStartTime);
+        updateCompareMetrics(false);
+        const comparedNames = [...selectedCompareAlgorithms].map(id => algorithms[id].title).join(" / ");
+        codeLine.textContent = `same map -> ${comparedNames}`;
+        hint.textContent = tr(
+          `선택한 ${selectedCompareAlgorithms.size}개 알고리즘을 같은 벽과 가중치 조건에서 비교 중입니다.`,
+          `Comparing ${selectedCompareAlgorithms.size} algorithms with the same walls and weights.`
+        );
+
+        if (allDone) {
+          stopTimer();
+          stateBadge.textContent = tr("비교 완료", "Comparison complete");
+          renderCompare();
+          updateCompareMetrics();
+          const rows = compareResultRows();
+          setLatestSnapshot(snapshotBase({ rows }), true);
+          const failures = rows.filter(row => !row.success);
+          hint.textContent = failures.length
+            ? `${tr("비교 완료", "Comparison complete")}: ${failures.map(row => `${row.title} ${reasonText(row.reason)}`).join(", ")}`
+            : tr(
+              `비교 완료: 1위 ${rows.find(row => row.rank === 1)?.title ?? "-"}`,
+              `Comparison complete: #1 ${rows.find(row => row.rank === 1)?.title ?? "-"}`
+            );
+        }
+      }, visualTickDelay());
+    }
+
+    async function runAverage() {
+      stopTimer();
+      const runToken = averageRunToken;
+      clearRunState();
+      running = true;
+      stateBadge.textContent = tr("평균 계산 중", "Calculating averages");
+      codeLine.textContent = `${repeatCount} random runs per algorithm`;
+      hint.textContent = tr("랜덤 맵을 연속 계산하는 중입니다.", "Calculating consecutive random maps.");
+      buildAveragePreview();
+      averageProgressFill.style.width = "0%";
+      averageProgressTitle.textContent = tr("평균 실행 준비", "Preparing average run");
+      averageProgressText.textContent = `0/${repeatCount}`;
+
+      const totals = {};
+      const algorithmIds = Object.keys(algorithms);
+      const previewInterval = Math.max(1, Math.ceil(repeatCount / 60));
+      const averageDurationMs = 15000;
+      for (const id of Object.keys(algorithms)) {
+        totals[id] = {
+          success: 0,
+          visited: 0,
+          path: 0,
+          cost: 0,
+          time: 0,
+          failures: { "NO PATH": 0, "STEP FAIL": 0, "TIME FAIL": 0, "ENERGY FAIL": 0 }
+        };
+      }
+
+      const startBench = performance.now();
+      for (let i = 0; i < repeatCount; i++) {
+        if (!running || runToken !== averageRunToken) return;
+        generateRandomMap();
+        const previewRuns = {};
+        for (const id of algorithmIds) {
+          const result = compute(id);
+          const verdict = evaluateResult(result);
+          previewRuns[id] = { result, verdict };
+          const effectivePath = verdict.success ? result.path : [];
+          const pathSet = new Set(effectivePath);
+          totals[id].success += verdict.success ? 1 : 0;
+          totals[id].visited += new Set(result.steps.map(step => step.current)).size;
+          totals[id].path += effectivePath.length;
+          totals[id].cost += [...pathSet].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
+          totals[id].time += verdict.duration;
+          if (!verdict.success) totals[id].failures[verdict.reason] += 1;
+        }
+        if (i % previewInterval === 0 || i === repeatCount - 1) {
+          renderAveragePreview(previewRuns, i + 1);
+          const targetElapsed = averageDurationMs * ((i + 1) / repeatCount);
+          const remainingDelay = Math.max(0, targetElapsed - (performance.now() - startBench));
+          if (remainingDelay > 0) {
+            await new Promise(resolve => setTimeout(resolve, remainingDelay));
+          }
+          if (!running || runToken !== averageRunToken) return;
+        }
+      }
+
+      const rawRows = Object.entries(algorithms).map(([id, item]) => {
+        const total = totals[id];
+        const failureEntry = Object.entries(total.failures).sort((a, b) => b[1] - a[1])[0];
+        return {
+          id,
+          title: item.title,
+          successValue: total.success / repeatCount,
+          avgVisitedValue: total.visited / repeatCount,
+          avgCostValue: total.cost / repeatCount,
+          avgTimeValue: total.time / repeatCount,
+          successRate: `${Math.round((total.success / repeatCount) * 100)}%`,
+          avgVisited: (total.visited / repeatCount).toFixed(1),
+          avgPath: (total.path / repeatCount).toFixed(1),
+          avgCost: (total.cost / repeatCount).toFixed(1),
+          avgTime: formatTime(total.time / repeatCount),
+          failureReason: failureEntry?.[1]
+            ? `${reasonText(failureEntry[0])} ${failureEntry[1]}${tr("회", " times")}`
+            : tr("없음", "None"),
+          failures: total.failures
+        };
+      });
+      const averageRanks = rankItems(rawRows, row => [
+        -row.successValue,
+        row.avgTimeValue,
+        row.avgCostValue,
+        row.avgVisitedValue
+      ]);
+      const rowsData = rawRows
+        .map(row => ({ ...row, rank: averageRanks[row.id] }))
+        .sort((a, b) => a.rank - b.rank);
+
+      renderAverageRows(rowsData);
+      elapsedMs = Math.round(performance.now() - startBench);
+      visitedCount.textContent = "-";
+      pathCount.textContent = "-";
+      pathCost.textContent = "-";
+      wallCount.textContent = walls.size;
+      timeCount.textContent = formatTime(elapsedMs);
+      averageNote.textContent = tr(
+        `${repeatCount}회 랜덤 실행 평균입니다. 제한 조건: 시간 ${useTimeLimit ? formatTime(timeLimitMs) : "없음"}, 에너지 ${useEnergyLimit ? energyLimit : "없음"}, 스텝 ${useStepLimit ? stepLimit : "없음"}.`,
+        `Average of ${repeatCount} random runs. Constraints: time ${useTimeLimit ? formatTime(timeLimitMs) : "None"}, energy ${useEnergyLimit ? energyLimit : "None"}, steps ${useStepLimit ? stepLimit : "None"}.`
+      );
+      stateBadge.textContent = tr("평균 완료", "Average complete");
+      averageProgressFill.style.width = "100%";
+      averageProgressTitle.textContent = tr("평균 실행 완료", "Average run complete");
+      averageProgressText.textContent = `${repeatCount}/${repeatCount} · ${formatTime(elapsedMs)}`;
+      hint.textContent = tr(
+        `평균 비교 완료: 1위 ${rowsData[0]?.title ?? "-"}`,
+        `Average comparison complete: #1 ${rowsData[0]?.title ?? "-"}`
+      );
+      setLatestSnapshot(snapshotBase({
+        repeatCount,
+        rows: rowsData.map(row => ({
+          id: row.id,
+          title: row.title,
+          rank: row.rank,
+          successRate: row.successRate,
+          avgVisited: row.avgVisited,
+          avgPath: row.avgPath,
+          avgCost: row.avgCost,
+          avgTime: row.avgTime,
+          failureReason: row.failureReason
+        }))
+      }), true);
+      running = false;
+    }
+
+    function editCell(cell) {
+      if (running) return;
+      const cellKey = key(cell);
+      if (tool === "start") {
+        if (!same(cell, currentGoal) && !walls.has(cellKey)) currentStart = cell;
+      } else if (tool === "goal") {
+        if (!same(cell, currentStart) && !walls.has(cellKey)) currentGoal = cell;
+      } else if (tool === "weight") {
+        if (weightsEnabled && !walls.has(cellKey) && !same(cell, currentStart) && !same(cell, currentGoal)) {
+          weights.set(cellKey, ((weights.get(cellKey) ?? 1) % 9) + 1);
+        }
+      } else if (!same(cell, currentStart) && !same(cell, currentGoal)) {
+        walls.has(cellKey) ? walls.delete(cellKey) : walls.add(cellKey);
+      }
+      clearRunState();
+    }
+
+    function generateRandomMap() {
+      walls.clear();
+      randomizeWeights();
+      if (pointsMode === "random") {
+        currentStart = defaultStart();
+        currentGoal = defaultGoal();
+      }
+      const candidates = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = { r, c };
+          if (same(cell, currentStart) || same(cell, currentGoal)) continue;
+          candidates.push(key(cell));
+        }
+      }
+      for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+      }
+      for (const cellKey of candidates.slice(0, Math.min(effectiveWallTarget(), candidates.length))) {
+        walls.add(cellKey);
+      }
+      if (pointsMode === "random") randomizePoints();
+    }
+
+    function randomWalls() {
+      stopTimer();
+      if (useGridSizeSettings && gridSizeMode === "random") {
+        randomizeGridSize();
+        return;
+      }
+      generateRandomMap();
+      clearRunState();
+    }
+
+    function farthestMazeCell(start) {
+      const queue = [start];
+      const distances = new Map([[key(start), 0]]);
+      let farthest = start;
+      for (let index = 0; index < queue.length; index++) {
+        const current = queue[index];
+        for (const next of neighbors(current)) {
+          const nextKey = key(next);
+          if (distances.has(nextKey)) continue;
+          distances.set(nextKey, distances.get(key(current)) + 1);
+          queue.push(next);
+          if (distances.get(nextKey) > distances.get(key(farthest))) farthest = next;
+        }
+      }
+      return farthest;
+    }
+
+    function generateMaze() {
+      stopTimer();
+      if (useGridSizeSettings && gridSizeMode === "random") {
+        cols = randomInt(10, 40);
+        rows = randomInt(8, 30);
+      }
+
+      rowsRange.value = rows;
+      colsRange.value = cols;
+      rowsLabel.textContent = rows;
+      colsLabel.textContent = cols;
+      updateGridVars();
+      buildGrid();
+      buildCompareGrids();
+
+      walls.clear();
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) walls.add(key({ r, c }));
+      }
+
+      const mazeAxis = length => {
+        const values = [];
+        for (let value = 0; value < length; value += 2) values.push(value);
+        if (values.at(-1) !== length - 1) values.push(length - 1);
+        return values;
+      };
+      const mazeRows = mazeAxis(rows);
+      const mazeCols = mazeAxis(cols);
+      const toCell = node => ({ r: mazeRows[node.r], c: mazeCols[node.c] });
+      const nodeKey = node => `${node.r},${node.c}`;
+      const startNode = { r: 0, c: 0 };
+      const start = toCell(startNode);
+      const stack = [startNode];
+      const visited = new Set([nodeKey(startNode)]);
+      const orthogonalDirections = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+      const diagonalDirections = [[-1, -1], [-1, 1], [1, 1], [1, -1]];
+      const diagonalLimit = Math.max(2, Math.floor(Math.min(rows, cols) / 5));
+      const mazeNodeCount = mazeRows.length * mazeCols.length;
+      let diagonalCarves = 0;
+      walls.delete(key(start));
+
+      while (stack.length) {
+        const currentNode = stack[stack.length - 1];
+        const current = toCell(currentNode);
+        const availableFrom = directions => directions
+          .map(([dr, dc]) => ({ r: currentNode.r + dr, c: currentNode.c + dc }))
+          .filter(next =>
+            next.r >= 0 &&
+            next.r < mazeRows.length &&
+            next.c >= 0 &&
+            next.c < mazeCols.length &&
+            !visited.has(nodeKey(next))
+          );
+        const orthogonalCandidates = availableFrom(orthogonalDirections);
+        const diagonalCandidates = diagonalMovement && diagonalCarves < diagonalLimit
+          ? availableFrom(diagonalDirections)
+          : [];
+        const forceFirstDiagonal =
+          diagonalCarves === 0 &&
+          visited.size >= Math.floor(mazeNodeCount * 0.25);
+        const useDiagonal =
+          diagonalCandidates.length > 0 &&
+          (forceFirstDiagonal || Math.random() < 0.12);
+        const candidates = useDiagonal ? diagonalCandidates : orthogonalCandidates;
+        if (!candidates.length) {
+          stack.pop();
+          continue;
+        }
+        const nextNode = candidates[Math.floor(Math.random() * candidates.length)];
+        const next = toCell(nextNode);
+        const rowStep = Math.sign(next.r - current.r);
+        const colStep = Math.sign(next.c - current.c);
+        let cursor = current;
+        while (!same(cursor, next)) {
+          const nextCursor = {
+            r: cursor.r === next.r ? cursor.r : cursor.r + rowStep,
+            c: cursor.c === next.c ? cursor.c : cursor.c + colStep
+          };
+          if (nextCursor.r !== cursor.r && nextCursor.c !== cursor.c) {
+            walls.delete(key({ r: nextCursor.r, c: cursor.c }));
+            walls.delete(key({ r: cursor.r, c: nextCursor.c }));
+          }
+          walls.delete(key(nextCursor));
+          cursor = nextCursor;
+        }
+        if (rowStep !== 0 && colStep !== 0) {
+          diagonalCarves++;
+        }
+        visited.add(nodeKey(nextNode));
+        stack.push(nextNode);
+      }
+
+      currentStart = start;
+      currentGoal = farthestMazeCell(currentStart);
+      if (pointsMode === "random") randomizePoints();
+      randomizeWeights();
+      clearRunState();
+      hint.textContent = tr(
+        diagonalMovement
+          ? "대각선 통로가 포함된 8방향 미로를 생성했습니다."
+          : "상하좌우 통로로 연결된 4방향 미로를 생성했습니다.",
+        diagonalMovement
+          ? "Generated an 8-direction maze with diagonal passages."
+          : "Generated a 4-direction maze with orthogonal passages."
+      );
+    }
+
+    function resizeGrid() {
+      stopTimer();
+      rows = Number(rowsRange.value);
+      cols = Number(colsRange.value);
+      rebuildGridForSize();
+    }
+
+    function rebuildGridForSize() {
+      updateGridVars();
+      currentStart = defaultStart();
+      currentGoal = defaultGoal();
+      walls.clear();
+      weights.clear();
+      buildGrid();
+      buildCompareGrids();
+      generateRandomMap();
+      clearRunState();
+    }
+
+    function randomizeGridSize() {
+      stopTimer();
+      cols = randomInt(10, 40);
+      rows = randomInt(8, 30);
+      colsRange.value = cols;
+      rowsRange.value = rows;
+      rebuildGridForSize();
+    }
+
+    function setGridSizeMode(next) {
+      gridSizeMode = next;
+      gridCustomBtn.classList.toggle("active", next === "custom");
+      gridRandomBtn.classList.toggle("active", next === "random");
+      if (next === "random") randomizeGridSize();
+      else clearRunState();
+    }
+
+    function clearAll() {
+      stopTimer();
+      currentStart = defaultStart();
+      currentGoal = defaultGoal();
+      walls.clear();
+      randomizeWeights();
+      if (pointsMode === "random") randomizePoints();
+      clearRunState();
+    }
+
+    function rerollWeights() {
+      stopTimer();
+      randomizeWeights();
+      clearRunState();
+    }
+
+    function toggleWeights() {
+      weightsEnabled = weightToggle.checked;
+      weightsBtn.disabled = !weightsEnabled;
+      weightTool.disabled = !weightsEnabled;
+      if (!weightsEnabled && tool === "weight") setTool("wall");
+      clearRunState();
+    }
+
+    function rerollPoints() {
+      stopTimer();
+      if (pointsMode === "random") {
+        randomizePoints();
+      } else {
+        currentStart = defaultStart();
+        currentGoal = defaultGoal();
+      }
+      clearRunState();
+    }
+
+    function setAlgorithm(next) {
+      stopTimer();
+      algorithm = next;
+      if (viewMode === "single") {
+        algorithmTitle.textContent = algorithms[next].title;
+        algorithmDesc.textContent = preferences.language === "en"
+          ? algorithms[next].descEn
+          : algorithms[next].desc;
+      }
+      for (const child of algorithmTabs.children) {
+        child.classList.toggle("active", child.dataset.algorithm === next);
+      }
+      clearRunState();
+    }
+
+    function setViewMode(next) {
+      stopTimer();
+      viewMode = next;
+      document.getElementById("singleViewBtn").classList.toggle("active", next === "single");
+      document.getElementById("compareViewBtn").classList.toggle("active", next === "compare");
+      document.getElementById("averageViewBtn").classList.toggle("active", next === "average");
+      compareSelection.classList.toggle("hidden", next !== "compare");
+      repeatControls.classList.toggle("hidden", next !== "average");
+      algorithmSection.classList.toggle("hidden", next !== "single");
+      grid.style.display = next === "single" ? "grid" : "none";
+      compareWrap.classList.toggle("active", next === "compare");
+      averagePanel.classList.toggle("active", next === "average");
+      if (next === "compare") {
+        updateCompareModeCopy();
+      } else if (next === "average") {
+        algorithmTitle.textContent = preferences.language === "en" ? "Average Performance" : "평균 성능 비교";
+        algorithmDesc.textContent = preferences.language === "en"
+          ? "Runs multiple random maps and compares average results."
+          : "랜덤 맵을 여러 번 실행해 알고리즘별 평균값을 비교합니다.";
+        codeLine.textContent = "repeat random maps -> average metrics";
+        hint.textContent = tr(
+          "연속 실행 횟수를 고르고 실행을 누르세요.",
+          "Choose the number of consecutive runs, then press Run."
+        );
+      } else {
+        algorithmTitle.textContent = algorithms[algorithm].title;
+        algorithmDesc.textContent = preferences.language === "en"
+          ? algorithms[algorithm].descEn
+          : algorithms[algorithm].desc;
+      }
+      clearRunState();
+    }
+
+    function updateWallTarget(value) {
+      if (wallTargetMode === "ratio") {
+        wallRatio = Number(value);
+        wallTargetLabel.textContent = `${wallRatio}%`;
+      } else {
+        wallTarget = Number(value);
+        wallTargetLabel.textContent = wallTarget;
+      }
+      updateRunSummary();
+    }
+
+    function setWallTargetMode(next) {
+      if (next === wallTargetMode) return;
+      if (next === "ratio") {
+        const maxWalls = Math.max(1, rows * cols - 2);
+        wallRatio = Math.round((wallTarget / maxWalls) * 100);
+      } else {
+        wallTarget = effectiveWallTarget();
+      }
+      wallTargetMode = next;
+      wallCountModeBtn.classList.toggle("active", next === "count");
+      wallRatioModeBtn.classList.toggle("active", next === "ratio");
+      wallTargetTitle.textContent = next === "ratio"
+        ? tr("벽 비율", "Wall ratio")
+        : tr("벽 개수", "Wall count");
+      updateGridVars();
+      updateRunSummary();
+      if (useWallTargetSettings) randomWalls();
+    }
+
+    function syncMapSettingControls() {
+      useGridSizeSettings = gridSizeToggle.checked;
+      useWallTargetSettings = wallTargetToggle.checked;
+      setLimitControlsEnabled(
+        gridSizeControls,
+        useGridSizeSettings,
+        [gridCustomBtn, gridRandomBtn, colsRange, rowsRange, rerollGridBtn]
+      );
+      setLimitControlsEnabled(
+        wallTargetControls,
+        useWallTargetSettings,
+        [wallCountModeBtn, wallRatioModeBtn, wallRange]
+      );
+
+      if (!useGridSizeSettings) {
+        gridSizeMode = "custom";
+        gridCustomBtn.classList.add("active");
+        gridRandomBtn.classList.remove("active");
+        rows = defaultRows;
+        cols = defaultCols;
+        rowsRange.value = rows;
+        colsRange.value = cols;
+      }
+
+      if (!useWallTargetSettings) {
+        wallTargetMode = "count";
+        wallTarget = Math.min(defaultWallTarget, Math.max(0, rows * cols - 2));
+      }
+
+      wallCountModeBtn.classList.toggle("active", wallTargetMode === "count");
+      wallRatioModeBtn.classList.toggle("active", wallTargetMode === "ratio");
+      wallTargetTitle.textContent = wallTargetMode === "ratio"
+        ? tr("벽 비율", "Wall ratio")
+        : tr("벽 개수", "Wall count");
+      updateGridVars();
+      updateRunSummary();
+    }
+
+    function updateMapSettingToggles() {
+      stopTimer();
+      syncMapSettingControls();
+      currentStart = defaultStart();
+      currentGoal = defaultGoal();
+      walls.clear();
+      weights.clear();
+      buildGrid();
+      buildCompareGrids();
+      generateRandomMap();
+      clearRunState();
+    }
+
+    function updateRepeatCount(value) {
+      repeatCount = Number(value);
+      repeatLabel.textContent = `${repeatCount}${tr("회", " runs")}`;
+    }
+
+    function updateTimeLimit(value) {
+      timeLimitMs = Number(value);
+      updateLimitLabels();
+      clearRunState();
+    }
+
+    function updateEnergyLimit(value) {
+      energyLimit = Number(value);
+      updateLimitLabels();
+      clearRunState();
+    }
+
+    function updateStepLimit(value) {
+      stepLimit = Number(value);
+      updateLimitLabels();
+      clearRunState();
+    }
+
+    function setLimitControlsEnabled(controls, enabled, elements) {
+      controls.classList.remove("hidden");
+      controls.classList.toggle("disabled", !enabled);
+      elements.forEach((element) => {
+        element.disabled = !enabled;
+      });
+    }
+
+    function updateLimitToggles() {
+      useTimeLimit = timeLimitToggle.checked;
+      useEnergyLimit = energyLimitToggle.checked;
+      useStepLimit = stepLimitToggle.checked;
+      setLimitControlsEnabled(timeLimitControls, useTimeLimit, [timeCustomBtn, timeRandomBtn, timeLimitRange]);
+      setLimitControlsEnabled(energyLimitControls, useEnergyLimit, [energyCustomBtn, energyRandomBtn, energyLimitRange]);
+      setLimitControlsEnabled(stepLimitControls, useStepLimit, [stepCustomBtn, stepRandomBtn, stepLimitRange]);
+      clearRunState();
+    }
+
+    function setLimitMode(type, next) {
+      if (type === "time") {
+        timeLimitMode = next;
+        timeCustomBtn.classList.toggle("active", next === "custom");
+        timeRandomBtn.classList.toggle("active", next === "random");
+      } else if (type === "energy") {
+        energyLimitMode = next;
+        energyCustomBtn.classList.toggle("active", next === "custom");
+        energyRandomBtn.classList.toggle("active", next === "random");
+      } else {
+        stepLimitMode = next;
+        stepCustomBtn.classList.toggle("active", next === "custom");
+        stepRandomBtn.classList.toggle("active", next === "random");
+      }
+      if (next === "random") randomizeActiveLimits();
+      clearRunState();
+    }
+
+    function toggleSidebar() {
+      const collapsed = appShell.classList.toggle("sidebar-collapsed");
+      sidebarToggle.textContent = collapsed ? "›" : "‹";
+      sidebarToggle.title = collapsed
+        ? tr("설정 패널 펼치기", "Expand settings panel")
+        : tr("설정 패널 접기", "Collapse settings panel");
+      setTimeout(applyZoom, 200);
+    }
+
+    function setPointsMode(next) {
+      stopTimer();
+      pointsMode = next;
+      manualPointsBtn.classList.toggle("active", next === "manual");
+      randomPointsBtn.classList.toggle("active", next === "random");
+      if (next === "random") randomizePoints();
+      clearRunState();
+    }
+
+    function setTool(next) {
+      tool = next;
+      document.getElementById("wallTool").classList.toggle("active", next === "wall");
+      document.getElementById("startTool").classList.toggle("active", next === "start");
+      document.getElementById("goalTool").classList.toggle("active", next === "goal");
+      weightTool.classList.toggle("active", next === "weight");
+      const helpText = {
+        wall: tr("벽: 칸을 눌러 벽을 추가하거나 제거합니다.", "Wall: click a cell to add or remove a wall."),
+        start: tr("시작점: 이동 가능한 칸을 눌러 시작 위치를 옮깁니다.", "Start: click an open cell to move the start point."),
+        goal: tr("도착점: 이동 가능한 칸을 눌러 목표 위치를 옮깁니다.", "Goal: click an open cell to move the goal point."),
+        weight: tr("가중치: 칸을 누를 때 이동 비용이 1부터 9까지 순서대로 바뀝니다.", "Weight: click a cell to cycle its movement cost from 1 to 9.")
+      };
+      toolHelp.textContent = helpText[next];
+    }
+
+    function initTabs() {
+      algorithmTabs.innerHTML = "";
+      for (const [id, item] of Object.entries(algorithms)) {
+        const button = document.createElement("button");
+        button.className = `tab ${id === algorithm ? "active" : ""}`;
+        button.type = "button";
+        button.dataset.algorithm = id;
+        const description = preferences.language === "en" ? item.descEn : item.desc;
+        button.innerHTML = `<strong>${item.title}</strong><span>${description}</span>`;
+        button.addEventListener("click", () => setAlgorithm(id));
+        algorithmTabs.appendChild(button);
+      }
+    }
+
+    document.getElementById("runBtn").addEventListener("click", run);
+    document.getElementById("pauseBtn").addEventListener("click", () => {
+      if (!running) return;
+      paused = !paused;
+      document.getElementById("pauseBtn").textContent = paused ? tr("계속", "Continue") : tr("일시정지", "Pause");
+      document.getElementById("quickPauseBtn").textContent = paused ? "▶" : "Ⅱ";
+      stateBadge.textContent = paused ? tr("일시정지", "Paused") : tr("실행 중", "Running");
+    });
+    document.getElementById("mazeBtn").addEventListener("click", randomWalls);
+    mazePresetBtn.addEventListener("click", generateMaze);
+    document.getElementById("weightsBtn").addEventListener("click", rerollWeights);
+    document.getElementById("clearBtn").addEventListener("click", clearAll);
+    document.getElementById("quickRunBtn").addEventListener("click", run);
+    document.getElementById("quickPauseBtn").addEventListener("click", () => document.getElementById("pauseBtn").click());
+    document.getElementById("quickMazeBtn").addEventListener("click", randomWalls);
+    document.getElementById("quickClearBtn").addEventListener("click", clearAll);
+    document.getElementById("singleViewBtn").addEventListener("click", () => setViewMode("single"));
+    document.getElementById("compareViewBtn").addEventListener("click", () => setViewMode("compare"));
+    document.getElementById("averageViewBtn").addEventListener("click", () => setViewMode("average"));
+    settingsSearch.addEventListener("input", filterSettings);
+    for (const button of settingsCategories.querySelectorAll("[data-settings-category]")) {
+      button.addEventListener("click", () => setSettingsCategory(button.dataset.settingsCategory));
+    }
+    for (const input of compareAlgorithmInputs) {
+      input.addEventListener("change", () => updateCompareSelection(input));
+    }
+    rowsRange.addEventListener("change", resizeGrid);
+    rowsRange.addEventListener("input", () => rowsLabel.textContent = rowsRange.value);
+    colsRange.addEventListener("change", resizeGrid);
+    colsRange.addEventListener("input", () => colsLabel.textContent = colsRange.value);
+    gridCustomBtn.addEventListener("click", () => setGridSizeMode("custom"));
+    gridRandomBtn.addEventListener("click", () => setGridSizeMode("random"));
+    gridSizeToggle.addEventListener("change", updateMapSettingToggles);
+    wallTargetToggle.addEventListener("change", updateMapSettingToggles);
+    wallCountModeBtn.addEventListener("click", () => setWallTargetMode("count"));
+    wallRatioModeBtn.addEventListener("click", () => setWallTargetMode("ratio"));
+    rerollGridBtn.addEventListener("click", () => {
+      if (gridSizeMode === "random") randomizeGridSize();
+      else resizeGrid();
+    });
+    wallRange.addEventListener("input", (event) => updateWallTarget(event.target.value));
+    wallRange.addEventListener("change", randomWalls);
+    repeatRange.addEventListener("input", (event) => updateRepeatCount(event.target.value));
+    timeLimitRange.addEventListener("input", (event) => updateTimeLimit(event.target.value));
+    energyLimitRange.addEventListener("input", (event) => updateEnergyLimit(event.target.value));
+    stepLimitRange.addEventListener("input", (event) => updateStepLimit(event.target.value));
+    timeLimitToggle.addEventListener("change", updateLimitToggles);
+    energyLimitToggle.addEventListener("change", updateLimitToggles);
+    stepLimitToggle.addEventListener("change", updateLimitToggles);
+    timeCustomBtn.addEventListener("click", () => setLimitMode("time", "custom"));
+    timeRandomBtn.addEventListener("click", () => setLimitMode("time", "random"));
+    energyCustomBtn.addEventListener("click", () => setLimitMode("energy", "custom"));
+    energyRandomBtn.addEventListener("click", () => setLimitMode("energy", "random"));
+    stepCustomBtn.addEventListener("click", () => setLimitMode("step", "custom"));
+    stepRandomBtn.addEventListener("click", () => setLimitMode("step", "random"));
+    sidebarToggle.addEventListener("click", toggleSidebar);
+    zoomOutBtn.addEventListener("click", () => changeZoom(-10));
+    zoomInBtn.addEventListener("click", () => changeZoom(10));
+    zoomResetBtn.addEventListener("click", () => {
+      preferences.zoom = 100;
+      applyZoom();
+      persistPreferences();
+    });
+    window.addEventListener("resize", applyZoom);
+    settingsBtn.addEventListener("click", () => settingsPanel.classList.toggle("open"));
+    settingsCloseBtn.addEventListener("click", () => settingsPanel.classList.remove("open"));
+    themeSelect.addEventListener("change", () => {
+      preferences.theme = themeSelect.value;
+      applyPreferences();
+      persistPreferences();
+    });
+    languageSelect.addEventListener("change", () => {
+      preferences.language = languageSelect.value;
+      applyPreferences();
+      persistPreferences();
+    });
+    speedSelect.addEventListener("change", () => {
+      preferences.speed = Number(speedSelect.value);
+      animationDelay = preferences.speed;
+      persistPreferences();
+    });
+    effectsToggle.addEventListener("change", () => {
+      preferences.effects = effectsToggle.checked;
+      applyPreferences();
+      persistPreferences();
+    });
+    telemetryToggle.addEventListener("change", () => {
+      preferences.telemetry = telemetryToggle.checked;
+      applyPreferences();
+      persistPreferences();
+    });
+    autoHistoryToggle.addEventListener("change", () => {
+      preferences.autoHistory = autoHistoryToggle.checked;
+      persistPreferences();
+    });
+    resetPreferencesBtn.addEventListener("click", () => {
+      preferences = { ...defaultPreferences };
+      applyPreferences();
+      persistPreferences();
+    });
+    document.addEventListener("click", (event) => {
+      if (
+        settingsPanel.classList.contains("open") &&
+        !settingsPanel.contains(event.target) &&
+        !settingsBtn.contains(event.target)
+      ) {
+        settingsPanel.classList.remove("open");
+      }
+    });
+    saveHistoryBtn.addEventListener("click", toggleSelectedHistoryKeep);
+    loadHistoryBtn.addEventListener("click", () => restoreHistoryEntry(selectedHistoryEntry()));
+    deleteHistoryBtn.addEventListener("click", deleteSelectedHistory);
+    function handleHistorySelection(source, other) {
+      if (source.value) other.value = "";
+      const entry = selectedHistoryEntry();
+      loadHistoryBtn.disabled = !entry;
+      deleteHistoryBtn.disabled = !entry;
+      saveHistoryBtn.disabled = !entry;
+      saveHistoryBtn.textContent = entry?.kept ? tr("보관 해제", "Unkeep") : tr("보관", "Keep");
+      historyDetail.textContent = entry
+        ? resultSummaryText(entry)
+        : tr("저장된 기록을 선택하세요.", "Select a saved record.");
+    }
+    historySelect.addEventListener("change", () => handleHistorySelection(historySelect, keptHistorySelect));
+    keptHistorySelect.addEventListener("change", () => handleHistorySelection(keptHistorySelect, historySelect));
+    manualPointsBtn.addEventListener("click", () => setPointsMode("manual"));
+    randomPointsBtn.addEventListener("click", () => setPointsMode("random"));
+    weightToggle.addEventListener("change", toggleWeights);
+    diagonalToggle.addEventListener("change", () => {
+      stopTimer();
+      diagonalMovement = diagonalToggle.checked;
+      clearRunState();
+      hint.textContent = diagonalMovement
+        ? tr(
+          "대각선 이동이 활성화되었습니다. 벽 모서리는 통과할 수 없습니다.",
+          "Diagonal movement is enabled. Paths cannot cut through wall corners."
+        )
+        : tr(
+          "대각선 이동이 비활성화되었습니다. 상하좌우로만 이동합니다.",
+          "Diagonal movement is disabled. Movement is limited to four directions."
+        );
+    });
+    document.getElementById("rerollPointsBtn").addEventListener("click", rerollPoints);
+    document.getElementById("wallTool").addEventListener("click", () => setTool("wall"));
+    document.getElementById("startTool").addEventListener("click", () => setTool("start"));
+    document.getElementById("goalTool").addEventListener("click", () => setTool("goal"));
+    weightTool.addEventListener("click", () => setTool("weight"));
+
+    loadPreferences();
+    initEditableSliderLabels();
+    syncMapSettingControls();
+    updateRepeatCount(repeatRange.value);
+    updateLimitLabels();
+    updateLimitToggles();
+    loadHistoryFromStorage();
+    initTabs();
+    filterSettings();
+    buildGrid();
+    compareSelectionCount.textContent = tr("4개 선택", "4 selected");
+    buildCompareGrids();
+    randomWalls();
+  </script>
+</body>
+</html>
