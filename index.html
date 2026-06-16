@@ -621,17 +621,17 @@
     }
 
     .settings-categories {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 2px;
     }
 
     .settings-categories .icon-btn {
-      min-width: max-content;
+      min-width: 0;
       min-height: 32px;
-      padding: 5px 9px;
-      font-size: 12px;
+      padding: 5px 4px;
+      font-size: 11px;
+      white-space: nowrap;
     }
 
     .settings-empty {
@@ -766,6 +766,15 @@
       white-space: nowrap;
     }
 
+    .stage-telemetry .metric.time-metric strong {
+      font-size: 13px;
+      line-height: 1.25;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
     .stage-telemetry .metric span {
       font-size: 10px;
     }
@@ -854,7 +863,7 @@
 
     .zoom-controls {
       display: grid;
-      grid-template-columns: 34px 58px 34px;
+      grid-template-columns: 34px minmax(110px, 150px) 58px 34px;
       gap: 5px;
       align-items: center;
     }
@@ -869,6 +878,11 @@
       color: var(--text);
       font-size: 12px;
       font-weight: 900;
+    }
+
+    .zoom-range {
+      width: 100%;
+      min-width: 0;
     }
 
     .settings-btn {
@@ -968,7 +982,8 @@
       z-index: 1;
       min-height: 0;
       display: grid;
-      place-items: center;
+      align-items: start;
+      justify-items: center;
       overflow: auto;
     }
 
@@ -976,7 +991,9 @@
       width: 100%;
       min-height: 100%;
       display: grid;
-      place-items: center;
+      align-items: start;
+      justify-items: center;
+      padding: 16px 0;
     }
 
     .grid {
@@ -1018,8 +1035,10 @@
 
     .average-panel {
       width: min(100%, 980px);
+      max-width: 100%;
+      min-width: 0;
       display: none;
-      overflow-x: auto;
+      overflow: hidden;
       border: 1px solid rgba(143, 167, 183, 0.18);
       border-radius: 8px;
       background: rgba(3, 7, 12, 0.72);
@@ -1032,9 +1051,10 @@
 
     .average-live {
       display: grid;
-      grid-template-columns: minmax(320px, 0.8fr) minmax(220px, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 12px;
       align-items: center;
+      justify-items: center;
       margin-bottom: 12px;
       padding-bottom: 12px;
       border-bottom: 1px solid rgba(143, 167, 183, 0.16);
@@ -1042,6 +1062,7 @@
 
     .average-preview {
       width: 100%;
+      max-width: 460px;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
@@ -1081,6 +1102,9 @@
     }
 
     .average-progress {
+      min-width: 0;
+      width: 100%;
+      max-width: 420px;
       display: grid;
       gap: 8px;
     }
@@ -1091,6 +1115,7 @@
     }
 
     .average-progress-track {
+      width: 100%;
       height: 8px;
       overflow: hidden;
       border-radius: 6px;
@@ -1104,12 +1129,19 @@
       transition: width 80ms linear;
     }
 
+    .result-table-wrap {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      border-radius: 8px;
+      scrollbar-gutter: stable;
+    }
+
     .result-table {
       width: 100%;
+      min-width: 720px;
       border-collapse: collapse;
       font-size: 13px;
-      overflow: hidden;
-      border-radius: 8px;
     }
 
     .result-table th,
@@ -1261,15 +1293,26 @@
     .statusbar {
       border-top: 1px solid rgba(143, 167, 183, 0.15);
       padding-top: 12px;
+      display: grid;
+      grid-template-columns: minmax(180px, 0.9fr) minmax(220px, 1.1fr);
+      align-items: center;
     }
 
     .code-line {
+      min-width: 0;
+      max-width: 100%;
       color: var(--muted);
       font-family: "Cascadia Mono", Consolas, monospace;
       font-size: 13px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .statusbar .status {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      text-align: right;
     }
 
     @media (min-width: 901px) {
@@ -1307,6 +1350,15 @@
         grid-template-columns: 1fr;
       }
 
+      .statusbar {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .statusbar .status {
+        text-align: left;
+      }
+
       .stage-telemetry .label {
         text-align: left;
       }
@@ -1327,6 +1379,15 @@
 
       .stage-bottom {
         grid-template-columns: 1fr;
+      }
+
+      .statusbar {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .statusbar .status {
+        text-align: left;
       }
 
       .stage-telemetry .label {
@@ -1637,8 +1698,9 @@
           <div class="status" id="algorithmDesc">가까운 칸부터 파동처럼 퍼져나갑니다.</div>
         </div>
         <div class="topbar-actions">
-          <div class="zoom-controls" aria-label="화면 확대 축소">
+          <div class="zoom-controls" id="zoomControls" aria-label="화면 확대 축소">
             <button class="icon-btn" id="zoomOutBtn" title="축소" aria-label="축소">−</button>
+            <input class="zoom-range" id="zoomRange" type="range" min="50" max="200" step="10" value="100" aria-label="화면 배율">
             <button class="icon-btn zoom-value" id="zoomResetBtn" title="기본 배율로 복원">100%</button>
             <button class="icon-btn" id="zoomInBtn" title="확대" aria-label="확대">+</button>
           </div>
@@ -1705,21 +1767,23 @@
                 </div>
               </div>
             </div>
-            <table class="result-table">
-              <thead>
-                <tr>
-                  <th>순위</th>
-                  <th>알고리즘</th>
-                  <th>성공률</th>
-                  <th>평균 탐색 칸</th>
-                  <th>평균 길이</th>
-                  <th>평균 비용</th>
-                  <th>평균 시간</th>
-                  <th>주요 실패</th>
-                </tr>
-              </thead>
-              <tbody id="averageBody"></tbody>
-            </table>
+            <div class="result-table-wrap">
+              <table class="result-table">
+                <thead>
+                  <tr>
+                    <th>순위</th>
+                    <th>알고리즘</th>
+                    <th>성공률</th>
+                    <th>평균 탐색 칸</th>
+                    <th>평균 길이</th>
+                    <th>평균 비용</th>
+                    <th>평균 시간</th>
+                    <th>주요 실패</th>
+                  </tr>
+                </thead>
+                <tbody id="averageBody"></tbody>
+              </table>
+            </div>
             <p class="average-note" id="averageNote">평균 모드에서 실행을 누르면 랜덤 맵을 여러 번 계산합니다.</p>
           </div>
         </div>
@@ -1737,7 +1801,7 @@
             <div class="metric"><span>경로 길이</span><strong id="pathCount">0</strong></div>
             <div class="metric"><span>경로 비용</span><strong id="pathCost">0</strong></div>
             <div class="metric"><span>벽 개수</span><strong id="wallCount">0</strong></div>
-            <div class="metric"><span>걸린 시간</span><strong id="timeCount">0ms (0.00초)</strong></div>
+            <div class="metric time-metric"><span>걸린 시간</span><strong id="timeCount">0ms (0.00초)</strong></div>
           </div>
         </section>
       </div>
@@ -1938,6 +2002,8 @@
     const zoomOutBtn = document.getElementById("zoomOutBtn");
     const zoomResetBtn = document.getElementById("zoomResetBtn");
     const zoomInBtn = document.getElementById("zoomInBtn");
+    const zoomRange = document.getElementById("zoomRange");
+    const zoomControls = document.getElementById("zoomControls");
     const zoomCanvas = document.getElementById("zoomCanvas");
 
     const translationPairs = [
@@ -2092,7 +2158,8 @@
       zoomInBtn.setAttribute("aria-label", zoomInBtn.title);
       zoomResetBtn.title = english ? "Reset zoom" : "기본 배율로 복원";
       zoomResetBtn.setAttribute("aria-label", zoomResetBtn.title);
-      document.querySelector(".zoom-controls").setAttribute("aria-label", english ? "Zoom controls" : "화면 확대 축소");
+      zoomRange.setAttribute("aria-label", english ? "Zoom scale" : "화면 배율");
+      zoomControls.setAttribute("aria-label", english ? "Zoom controls" : "화면 확대 축소");
       sidebarToggle.title = english ? "Collapse or expand settings" : "설정 패널 접기/펼치기";
       document.querySelector(".brand p").textContent = english
         ? "Compare BFS, DFS, Dijkstra, and A* on the same animated network map."
@@ -2193,6 +2260,7 @@
         gridWrap.scrollTop = 0;
       }
       zoomResetBtn.textContent = `${zoom}%`;
+      zoomRange.value = String(zoom);
       zoomOutBtn.disabled = zoom <= 50;
       zoomInBtn.disabled = zoom >= 200;
     }
@@ -2201,6 +2269,17 @@
       preferences.zoom = Math.min(200, Math.max(50, preferences.zoom + amount));
       applyZoom();
       persistPreferences();
+    }
+
+    function resetZoom() {
+      preferences.zoom = 100;
+      applyZoom();
+      persistPreferences();
+    }
+
+    function handleZoomWheel(event) {
+      event.preventDefault();
+      changeZoom(event.deltaY < 0 ? 10 : -10);
     }
 
     function applyPreferences() {
@@ -2343,6 +2422,12 @@
       return path.reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
     }
 
+    function pathCostTotal(pathSet) {
+      let total = 0;
+      for (const cellKey of pathSet) total += cost(fromKey(cellKey));
+      return total;
+    }
+
     function maxAllowedSteps() {
       const stepSteps = useStepLimit ? stepLimit : Infinity;
       return stepSteps;
@@ -2351,8 +2436,8 @@
     function evaluateResult(result) {
       const energy = pathEnergy(result.path);
       const duration = result.computeMs;
+      if (result.stoppedByStepLimit || (useStepLimit && result.steps.length > stepLimit)) return { success: false, reason: "STEP FAIL", energy, duration };
       if (!result.path.length) return { success: false, reason: "NO PATH", energy, duration };
-      if (useStepLimit && result.steps.length > stepLimit) return { success: false, reason: "STEP FAIL", energy, duration };
       if (useTimeLimit && result.computeMs > timeLimitMs) return { success: false, reason: "TIME FAIL", energy, duration };
       if (useEnergyLimit && energy > energyLimit) return { success: false, reason: "ENERGY FAIL", energy, duration };
       return { success: true, reason: "PATH FOUND", energy, duration };
@@ -2415,7 +2500,7 @@
           id,
           success: run.success,
           time: run.timeMs ?? Infinity,
-          cost: [...run.path].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0),
+          cost: run.cost ?? 0,
           visited: run.visited.size
         }));
       return rankItems(completed, item => [
@@ -2436,7 +2521,7 @@
         reason: run.reason,
         visited: run.visited.size,
         path: run.path.size,
-        cost: [...run.path].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0),
+        cost: run.cost ?? 0,
         energy: run.energy ?? 0,
         timeMs: run.timeMs ?? 0
       }));
@@ -2465,19 +2550,31 @@
       stepLimitLabel.textContent = stepLimit;
     }
 
-    function randomizeActiveLimits() {
-      if (useTimeLimit && timeLimitMode === "random") {
-        timeLimitMs = randomInt(2500, 5000, 100);
+    function randomRangeValue(range) {
+      const min = Number(range.min || 0);
+      const max = Number(range.max || range.value || min);
+      const step = range.step && range.step !== "any" ? Number(range.step) : 1;
+      return randomInt(min, max, step);
+    }
+
+    function randomizeLimit(type) {
+      if (type === "time") {
+        timeLimitMs = randomRangeValue(timeLimitRange);
         timeLimitRange.value = timeLimitMs;
-      }
-      if (useEnergyLimit && energyLimitMode === "random") {
-        energyLimit = randomInt(60, 120);
+      } else if (type === "energy") {
+        energyLimit = randomRangeValue(energyLimitRange);
         energyLimitRange.value = energyLimit;
-      }
-      if (useStepLimit && stepLimitMode === "random") {
-        stepLimit = randomInt(80, 180);
+      } else if (type === "step") {
+        stepLimit = randomRangeValue(stepLimitRange);
         stepLimitRange.value = stepLimit;
       }
+      updateLimitLabels();
+    }
+
+    function randomizeActiveLimits() {
+      if (useTimeLimit && timeLimitMode === "random") randomizeLimit("time");
+      if (useEnergyLimit && energyLimitMode === "random") randomizeLimit("energy");
+      if (useStepLimit && stepLimitMode === "random") randomizeLimit("step");
       updateLimitLabels();
     }
 
@@ -2634,6 +2731,19 @@
       return path;
     }
 
+    function stepLimitExceeded(steps) {
+      return useStepLimit && steps.length > stepLimit;
+    }
+
+    function searchResult(steps, path = [], stoppedByStepLimit = false) {
+      return {
+        steps,
+        path,
+        stoppedByStepLimit,
+        exploredCount: steps.length
+      };
+    }
+
     function makeBfs() {
       const queue = [currentStart];
       let queueIndex = 0;
@@ -2646,7 +2756,8 @@
         const currentKey = key(current);
         if (same(current, currentGoal)) {
           steps.push({ current: currentKey, added: [], code: "goal reached" });
-          return { steps, path: reconstruct(cameFrom) };
+          if (stepLimitExceeded(steps)) return searchResult(steps, [], true);
+          return searchResult(steps, reconstruct(cameFrom));
         }
 
         const added = [];
@@ -2659,8 +2770,9 @@
           added.push(nextKey);
         }
         steps.push({ current: currentKey, added, code: "queue.shift()" });
+        if (stepLimitExceeded(steps)) return searchResult(steps, [], true);
       }
-      return { steps, path: [] };
+      return searchResult(steps);
     }
 
     function heapPush(heap, item) {
@@ -2707,7 +2819,8 @@
         const currentKey = key(current);
         if (same(current, currentGoal)) {
           steps.push({ current: currentKey, added: [], code: "goal reached" });
-          return { steps, path: reconstruct(cameFrom) };
+          if (stepLimitExceeded(steps)) return searchResult(steps, [], true);
+          return searchResult(steps, reconstruct(cameFrom));
         }
 
         const added = [];
@@ -2720,8 +2833,9 @@
           added.push(nextKey);
         }
         steps.push({ current: currentKey, added, code: "stack.pop()" });
+        if (stepLimitExceeded(steps)) return searchResult(steps, [], true);
       }
-      return { steps, path: [] };
+      return searchResult(steps);
     }
 
     function makeWeighted(useHeuristic) {
@@ -2747,7 +2861,8 @@
 
         if (same(current, currentGoal)) {
           steps.push({ current: currentKey, added: [], code: "goal reached" });
-          return { steps, path: reconstruct(cameFrom) };
+          if (stepLimitExceeded(steps)) return searchResult(steps, [], true);
+          return searchResult(steps, reconstruct(cameFrom));
         }
 
         const added = [];
@@ -2770,8 +2885,9 @@
           added,
           code: useHeuristic ? "lowest g + h selected" : "lowest distance selected"
         });
+        if (stepLimitExceeded(steps)) return searchResult(steps, [], true);
       }
-      return { steps, path: [] };
+      return searchResult(steps);
     }
 
     const searchEngine = Object.freeze({
@@ -2808,7 +2924,12 @@
       paint();
     }
 
-    function buildCompareGrids() {
+    function buildCompareGrids(force = false) {
+      compareWrap.dataset.count = selectedCompareAlgorithms.size;
+      if (!force && viewMode !== "compare") {
+        compareWrap.innerHTML = "";
+        return;
+      }
       compareWrap.innerHTML = "";
       const compareFragment = document.createDocumentFragment();
       const selectedIds = [...selectedCompareAlgorithms];
@@ -2856,11 +2977,13 @@
       selectedCompareAlgorithms = new Set(checked.map(input => input.dataset.compareAlgorithm));
       const count = selectedCompareAlgorithms.size;
       compareSelectionCount.textContent = tr(`${count}개 선택`, `${count} selected`);
-      buildCompareGrids();
       if (viewMode === "compare") {
         stopTimer();
+        buildCompareGrids(true);
         updateCompareModeCopy();
         clearRunState();
+      } else {
+        buildCompareGrids();
       }
     }
 
@@ -2881,6 +3004,7 @@
 
     function buildAveragePreview() {
       averagePreview.innerHTML = "";
+      const emptyState = { visited: new Set(), frontier: new Set(), path: new Set() };
       const previewFragment = document.createDocumentFragment();
       for (const [id, item] of Object.entries(algorithms)) {
         const card = document.createElement("div");
@@ -2906,7 +3030,7 @@
         }
         previewGrid.appendChild(gridFragment);
         for (const cell of previewGrid.children) {
-          paintCell(cell, { visited: new Set(), frontier: new Set(), path: new Set() });
+          paintCell(cell, emptyState);
           cell.textContent = "";
         }
         previewFragment.appendChild(card);
@@ -2947,6 +3071,30 @@
       );
     }
 
+    function updateAverageProgress(runNumber) {
+      const progress = Math.round((runNumber / repeatCount) * 100);
+      averageProgressFill.style.width = `${progress}%`;
+      averageProgressTitle.textContent = `${tr("4개 알고리즘", "4 algorithms")} · ${runNumber}/${repeatCount}`;
+      averageProgressText.textContent = tr(
+        `${progress}% 계산 중`,
+        `${progress}% complete`
+      );
+    }
+
+    function averagePreviewInterval() {
+      if (repeatCount >= 500) return Math.ceil(repeatCount / 12);
+      if (repeatCount >= 300) return Math.ceil(repeatCount / 16);
+      if (repeatCount >= 100) return Math.ceil(repeatCount / 28);
+      return Math.max(1, Math.ceil(repeatCount / 50));
+    }
+
+    function averageYieldInterval() {
+      if (repeatCount >= 500) return 3;
+      if (repeatCount >= 300) return 4;
+      if (repeatCount >= 100) return 6;
+      return 10;
+    }
+
     function paintCell(el, state) {
       const cell = { r: Number(el.dataset.r), c: Number(el.dataset.c) };
       const cellKey = key(cell);
@@ -2962,10 +3110,13 @@
       if (preferences.theme === "light") {
         el.style.setProperty(
           "--cell-bg",
-          `rgb(${238 - cellWeight * 8}, ${246 - cellWeight * 7}, ${249 - cellWeight * 5})`
+          `linear-gradient(145deg, rgb(${242 - cellWeight * 3}, ${244 - cellWeight * 8}, ${236 - cellWeight * 14}) 0%, rgb(${224 - cellWeight * 3}, ${230 - cellWeight * 12}, ${226 - cellWeight * 17}) 100%)`
         );
       } else {
-        el.style.setProperty("--cell-bg", `rgba(${22 + cellWeight * 10}, ${34 + cellWeight * 5}, ${45 + cellWeight * 2}, 0.88)`);
+        el.style.setProperty(
+          "--cell-bg",
+          `linear-gradient(145deg, rgba(${36 + cellWeight * 16}, ${45 + cellWeight * 10}, ${52 + cellWeight * 2}, 0.98) 0%, rgba(${22 + cellWeight * 16}, ${28 + cellWeight * 9}, ${34 + cellWeight}, 0.97) 100%)`
+        );
       }
       if (walls.has(cellKey)) el.classList.add("wall");
       if (state.visited.has(cellKey)) el.classList.add("visited");
@@ -3031,7 +3182,7 @@
           for (const el of miniGrid.children) paintCell(el, state);
         }
         const stat = card.querySelector("[data-stat]");
-        const costTotal = [...run.path].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
+        const costTotal = run.cost ?? 0;
         stat.textContent = run.done
           ? `#${ranks[id]} ${reasonText(run.reason)} / ${tr("탐색", "explored")} ${run.visited.size || 0} / ${tr("경로", "path")} ${run.path.size || 0} / ${tr("비용", "cost")} ${costTotal} / ${formatTime(run.timeMs)}`
           : `${tr("탐색", "Explored")} ${run.visited.size || 0} ${tr("칸", "cells")}`;
@@ -3043,9 +3194,7 @@
       const runs = Object.values(compareRuns);
       visitedCount.textContent = runs.reduce((sum, run) => sum + run.visited.size, 0);
       pathCount.textContent = runs.reduce((sum, run) => sum + run.path.size, 0);
-      pathCost.textContent = runs.reduce((sum, run) => {
-        return sum + [...run.path].reduce((inner, cellKey) => inner + cost(fromKey(cellKey)), 0);
-      }, 0);
+      pathCost.textContent = runs.reduce((sum, run) => sum + (run.cost ?? 0), 0);
       wallCount.textContent = walls.size;
       if (includeSummary) updateRunSummary();
       timeCount.textContent = runs.length
@@ -3359,7 +3508,7 @@
       syncMapSettingControls();
       updateLimitToggles();
       buildGrid();
-      buildCompareGrids();
+      buildCompareGrids(entry.mode === "compare");
       setViewMode(entry.mode);
       setAlgorithm(entry.algorithm);
       setLatestSnapshot(entry);
@@ -3397,6 +3546,15 @@
         : viewMode === "average"
           ? tr("실행을 누르면 랜덤 맵 여러 개를 빠르게 계산해 평균값을 냅니다.", "Run to calculate averages across multiple random maps.")
           : tr("칸을 클릭해 벽을 만들고 실행하세요.", "Click cells to add walls, then run the algorithm.");
+      if (viewMode === "average") {
+        buildAveragePreview();
+        averageProgressTitle.textContent = tr("실행 전", "Not started");
+        averageProgressText.textContent = tr(
+          "샘플 미니맵을 보고 실행하면 실제 평균 계산으로 바뀝니다.",
+          "Sample mini maps are shown until a real average run starts."
+        );
+        averageProgressFill.style.width = "0";
+      }
       paint();
     }
 
@@ -3490,6 +3648,7 @@
     }
 
     function runCompare() {
+      if (!compareWrap.children.length) buildCompareGrids(true);
       running = true;
       runStartTime = performance.now();
       stateBadge.textContent = tr("비교 중", "Comparing");
@@ -3525,6 +3684,7 @@
               run.reason = "STEP FAIL";
               run.timeMs = run.result.computeMs;
               run.energy = 0;
+              run.cost = 0;
               continue;
             }
             const step = run.result.steps[index];
@@ -3538,6 +3698,7 @@
               run.reason = verdict.reason;
               run.timeMs = verdict.duration;
               run.energy = verdict.energy;
+              run.cost = verdict.success ? pathCostTotal(run.path) : 0;
               continue;
             }
             run.frontier.delete(step.current);
@@ -3596,7 +3757,9 @@
 
       const totals = {};
       const algorithmIds = Object.keys(algorithms);
-      const previewInterval = Math.max(1, Math.ceil(repeatCount / 60));
+      const previewInterval = averagePreviewInterval();
+      const progressInterval = Math.max(1, Math.ceil(repeatCount / 100));
+      const yieldInterval = averageYieldInterval();
       const averageDurationMs = 15000;
       for (const id of Object.keys(algorithms)) {
         totals[id] = {
@@ -3621,18 +3784,24 @@
           const effectivePath = verdict.success ? result.path : [];
           const pathSet = new Set(effectivePath);
           totals[id].success += verdict.success ? 1 : 0;
-          totals[id].visited += new Set(result.steps.map(step => step.current)).size;
+          totals[id].visited += result.exploredCount ?? result.steps.length;
           totals[id].path += effectivePath.length;
-          totals[id].cost += [...pathSet].reduce((sum, cellKey) => sum + cost(fromKey(cellKey)), 0);
+          totals[id].cost += pathCostTotal(pathSet);
           totals[id].time += verdict.duration;
           if (!verdict.success) totals[id].failures[verdict.reason] += 1;
         }
         if (i % previewInterval === 0 || i === repeatCount - 1) {
           renderAveragePreview(previewRuns, i + 1);
+        } else if (i % progressInterval === 0) {
+          updateAverageProgress(i + 1);
+        }
+        if (i % yieldInterval === 0 || i % previewInterval === 0 || i === repeatCount - 1) {
           const targetElapsed = averageDurationMs * ((i + 1) / repeatCount);
           const remainingDelay = Math.max(0, targetElapsed - (performance.now() - startBench));
           if (remainingDelay > 0) {
-            await new Promise(resolve => setTimeout(resolve, remainingDelay));
+            await new Promise(resolve => setTimeout(resolve, Math.min(remainingDelay, 120)));
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 0));
           }
           if (!running || runToken !== averageRunToken) return;
         }
@@ -3980,8 +4149,12 @@
       compareWrap.classList.toggle("active", next === "compare");
       averagePanel.classList.toggle("active", next === "average");
       if (next === "compare") {
+        averagePreview.innerHTML = "";
+        averageBody.innerHTML = "";
+        buildCompareGrids(true);
         updateCompareModeCopy();
       } else if (next === "average") {
+        compareWrap.innerHTML = "";
         algorithmTitle.textContent = preferences.language === "en" ? "Average Performance" : "평균 성능 비교";
         algorithmDesc.textContent = preferences.language === "en"
           ? "Runs multiple random maps and compares average results."
@@ -3992,6 +4165,9 @@
           "Choose the number of consecutive runs, then press Run."
         );
       } else {
+        compareWrap.innerHTML = "";
+        averagePreview.innerHTML = "";
+        averageBody.innerHTML = "";
         algorithmTitle.textContent = algorithms[algorithm].title;
         algorithmDesc.textContent = preferences.language === "en"
           ? algorithms[algorithm].descEn
@@ -4136,7 +4312,7 @@
         stepCustomBtn.classList.toggle("active", next === "custom");
         stepRandomBtn.classList.toggle("active", next === "random");
       }
-      if (next === "random") randomizeActiveLimits();
+      if (next === "random") randomizeLimit(type);
       clearRunState();
     }
 
@@ -4245,11 +4421,13 @@
     sidebarToggle.addEventListener("click", toggleSidebar);
     zoomOutBtn.addEventListener("click", () => changeZoom(-10));
     zoomInBtn.addEventListener("click", () => changeZoom(10));
-    zoomResetBtn.addEventListener("click", () => {
-      preferences.zoom = 100;
+    zoomResetBtn.addEventListener("click", resetZoom);
+    zoomRange.addEventListener("input", (event) => {
+      preferences.zoom = Number(event.target.value);
       applyZoom();
-      persistPreferences();
     });
+    zoomRange.addEventListener("change", persistPreferences);
+    zoomRange.addEventListener("wheel", handleZoomWheel, { passive: false });
     window.addEventListener("resize", applyZoom);
     settingsBtn.addEventListener("click", () => settingsPanel.classList.toggle("open"));
     settingsCloseBtn.addEventListener("click", () => settingsPanel.classList.remove("open"));
