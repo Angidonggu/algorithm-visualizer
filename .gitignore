@@ -1,0 +1,11 @@
+# Local OS files
+Thumbs.db
+Desktop.ini
+
+# Editor folders
+.vscode/
+.idea/
+
+# Temporary verification files
+finish-check.png
+verification-*.png
