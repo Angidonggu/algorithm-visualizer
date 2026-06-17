@@ -1233,6 +1233,23 @@
       box-shadow: none;
     }
 
+    body.animating .cell {
+      transition: none;
+    }
+
+    body.animating .visited,
+    body.animating .path {
+      transform: none;
+    }
+
+    body.animating .visited,
+    body.animating .frontier,
+    body.animating .path,
+    body.animating .start,
+    body.animating .goal {
+      box-shadow: none;
+    }
+
     body.large-grid .cell:hover {
       outline: none;
     }
@@ -3563,6 +3580,7 @@
         cancelAnimationFrame(timer);
         clearInterval(timer);
       }
+      document.body.classList.remove("animating");
       averageRunToken++;
       timer = null;
       running = false;
@@ -3597,6 +3615,7 @@
         return;
       }
       running = true;
+      document.body.classList.add("animating");
       runStartTime = performance.now();
       stateBadge.textContent = tr("실행 중", "Running");
       const result = compute();
@@ -3665,6 +3684,7 @@
     function runCompare() {
       if (!compareWrap.children.length) buildCompareGrids(true);
       running = true;
+      document.body.classList.add("animating");
       runStartTime = performance.now();
       stateBadge.textContent = tr("비교 중", "Comparing");
       compareRuns = {};
@@ -3761,6 +3781,7 @@
       const runToken = averageRunToken;
       clearRunState();
       running = true;
+      document.body.classList.add("animating");
       stateBadge.textContent = tr("평균 계산 중", "Calculating averages");
       codeLine.textContent = `${repeatCount} random runs per algorithm`;
       hint.textContent = tr("랜덤 맵을 연속 계산하는 중입니다.", "Calculating consecutive random maps.");
@@ -4381,6 +4402,7 @@
     document.getElementById("pauseBtn").addEventListener("click", () => {
       if (!running) return;
       paused = !paused;
+      document.body.classList.toggle("animating", !paused);
       document.getElementById("pauseBtn").textContent = paused ? tr("계속", "Continue") : tr("일시정지", "Pause");
       document.getElementById("quickPauseBtn").textContent = paused ? "▶" : "Ⅱ";
       stateBadge.textContent = paused ? tr("일시정지", "Paused") : tr("실행 중", "Running");
