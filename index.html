@@ -3559,13 +3559,29 @@
     }
 
     function stopTimer() {
-      if (timer) clearInterval(timer);
+      if (timer) {
+        cancelAnimationFrame(timer);
+        clearInterval(timer);
+      }
       averageRunToken++;
       timer = null;
       running = false;
       paused = false;
       document.getElementById("pauseBtn").textContent = tr("일시정지", "Pause");
       document.getElementById("quickPauseBtn").textContent = "Ⅱ";
+    }
+
+    function startVisualLoop(stepFrame) {
+      let lastFrame = 0;
+      const frame = (now) => {
+        if (!running) return;
+        if (!paused && now - lastFrame >= visualTickDelay()) {
+          lastFrame = now;
+          stepFrame();
+        }
+        if (running) timer = requestAnimationFrame(frame);
+      };
+      timer = requestAnimationFrame(frame);
     }
 
     function run() {
@@ -3588,8 +3604,7 @@
       const batchSize = animationBatchSize();
       let index = 0;
 
-      timer = setInterval(() => {
-        if (paused) return;
+      startVisualLoop(() => {
         const changedKeys = new Set(frontierCells);
         let latestStep = null;
         for (let batch = 0; batch < batchSize; batch++) {
@@ -3644,7 +3659,7 @@
         });
         updateSingleMetrics();
         timeCount.textContent = formatTime(elapsedMs);
-      }, visualTickDelay());
+      });
     }
 
     function runCompare() {
@@ -3665,8 +3680,7 @@
 
       const batchSize = animationBatchSize();
       let index = 0;
-      timer = setInterval(() => {
-        if (paused) return;
+      startVisualLoop(() => {
         let allDone = true;
         const changedByAlgorithm = new Map();
         for (let batch = 0; batch < batchSize; batch++) {
@@ -3739,7 +3753,7 @@
               `Comparison complete: #1 ${rows.find(row => row.rank === 1)?.title ?? "-"}`
             );
         }
-      }, visualTickDelay());
+      });
     }
 
     async function runAverage() {
