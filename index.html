@@ -1875,7 +1875,8 @@
     let frontierCells = new Set();
     let pathCells = new Set();
     let compareRuns = {};
-    let selectedCompareAlgorithms = new Set(["bfs", "dfs", "dijkstra", "astar"]);
+    const defaultCompareAlgorithms = ["bfs", "dfs", "dijkstra", "astar"];
+    let selectedCompareAlgorithms = new Set(defaultCompareAlgorithms);
     let runStartTime = 0;
     let elapsedMs = 0;
     let averageRunToken = 0;
@@ -1883,6 +1884,32 @@
     let executionHistory = [];
     const historyStorageKey = "cyber-pathfinder-history-v1";
     const preferencesStorageKey = "cyber-pathfinder-preferences-v1";
+    const defaultRuntimeSettings = Object.freeze({
+      rows: defaultRows,
+      cols: defaultCols,
+      algorithm: "bfs",
+      viewMode: "single",
+      pointsMode: "manual",
+      gridSizeMode: "custom",
+      useGridSizeSettings: false,
+      useWallTargetSettings: false,
+      tool: "wall",
+      weightsEnabled: true,
+      diagonalMovement: false,
+      wallTarget: defaultWallTarget,
+      wallTargetMode: "count",
+      wallRatio: 25,
+      repeatCount: 20,
+      useTimeLimit: false,
+      timeLimitMs: 3000,
+      useEnergyLimit: false,
+      energyLimit: 80,
+      useStepLimit: false,
+      stepLimit: 160,
+      timeLimitMode: "custom",
+      energyLimitMode: "custom",
+      stepLimitMode: "custom"
+    });
     const defaultPreferences = {
       theme: "dark",
       language: "ko",
@@ -4121,14 +4148,97 @@
       else clearRunState();
     }
 
-    function clearAll() {
+    function resetRuntimeDefaults() {
       stopTimer();
+      const defaults = defaultRuntimeSettings;
+      rows = defaults.rows;
+      cols = defaults.cols;
+      algorithm = defaults.algorithm;
+      viewMode = defaults.viewMode;
+      pointsMode = defaults.pointsMode;
+      gridSizeMode = defaults.gridSizeMode;
+      useGridSizeSettings = defaults.useGridSizeSettings;
+      useWallTargetSettings = defaults.useWallTargetSettings;
+      tool = defaults.tool;
+      weightsEnabled = defaults.weightsEnabled;
+      diagonalMovement = defaults.diagonalMovement;
+      wallTarget = defaults.wallTarget;
+      wallTargetMode = defaults.wallTargetMode;
+      wallRatio = defaults.wallRatio;
+      repeatCount = defaults.repeatCount;
+      useTimeLimit = defaults.useTimeLimit;
+      timeLimitMs = defaults.timeLimitMs;
+      useEnergyLimit = defaults.useEnergyLimit;
+      energyLimit = defaults.energyLimit;
+      useStepLimit = defaults.useStepLimit;
+      stepLimit = defaults.stepLimit;
+      timeLimitMode = defaults.timeLimitMode;
+      energyLimitMode = defaults.energyLimitMode;
+      stepLimitMode = defaults.stepLimitMode;
+      selectedCompareAlgorithms = new Set(defaultCompareAlgorithms);
+      walls.clear();
+      weights.clear();
+      compareRuns = {};
+      latestSnapshot = null;
+
+      rowsRange.value = rows;
+      colsRange.value = cols;
+      repeatRange.value = repeatCount;
+      timeLimitRange.value = timeLimitMs;
+      energyLimitRange.value = energyLimit;
+      stepLimitRange.value = stepLimit;
+      gridSizeToggle.checked = useGridSizeSettings;
+      wallTargetToggle.checked = useWallTargetSettings;
+      weightToggle.checked = weightsEnabled;
+      diagonalToggle.checked = diagonalMovement;
+      timeLimitToggle.checked = useTimeLimit;
+      energyLimitToggle.checked = useEnergyLimit;
+      stepLimitToggle.checked = useStepLimit;
+      for (const input of compareAlgorithmInputs) {
+        input.checked = selectedCompareAlgorithms.has(input.dataset.compareAlgorithm);
+      }
+      compareSelectionCount.textContent = tr(
+        `${selectedCompareAlgorithms.size}媛??좏깮`,
+        `${selectedCompareAlgorithms.size} selected`
+      );
+
+      manualPointsBtn.classList.add("active");
+      randomPointsBtn.classList.remove("active");
+      gridCustomBtn.classList.add("active");
+      gridRandomBtn.classList.remove("active");
+      wallCountModeBtn.classList.add("active");
+      wallRatioModeBtn.classList.remove("active");
+      timeCustomBtn.classList.add("active");
+      timeRandomBtn.classList.remove("active");
+      energyCustomBtn.classList.add("active");
+      energyRandomBtn.classList.remove("active");
+      stepCustomBtn.classList.add("active");
+      stepRandomBtn.classList.remove("active");
+      weightsBtn.disabled = false;
+      weightTool.disabled = false;
+
       currentStart = defaultStart();
       currentGoal = defaultGoal();
-      walls.clear();
-      randomizeWeights();
-      if (pointsMode === "random") randomizePoints();
+      updateGridVars();
+      updateLimitLabels();
+      updateRepeatCount(repeatCount);
+      syncMapSettingControls();
+      updateLimitToggles();
+      setTool(tool);
+      buildGrid();
+      generateRandomMap();
+      buildCompareGrids(false);
+      setViewMode(viewMode);
+      setAlgorithm(algorithm);
       clearRunState();
+      hint.textContent = tr(
+        "기본값으로 되돌리고 기본 맵을 다시 생성했습니다.",
+        "Reset to defaults and generated a fresh default map."
+      );
+    }
+
+    function clearAll() {
+      resetRuntimeDefaults();
     }
 
     function rerollWeights() {
